@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Năng Suất Sale — Yêu Cầu · Vệ Tinh · Nhắc Lịch</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --dark:#0d3b36;--dark2:#0f4f47;--teal:#13836f;--teal-light:#1fae9a;
+  --bg:#eaf3ef;--card:#ffffff;--green-text:#2e7d32;--green-bg:#e3f2e4;
+  --red:#d9534f;--red-bg:#fbe3e2;--amber-text:#a9701b;--amber-bg:#fdf1d8;
+  --purple:#6a3fa0;--tealbar:#0f7a6c;--text:#1f2d2a;--muted:#5f7470;--border:#dfe9e5;
+  --gold:#d4a017;--silver:#9aa5ad;--bronze:#b5652c;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:var(--text);background:var(--bg);padding:18px}
+.wrap{max-width:1180px;margin:0 auto}
+
+.header{background:linear-gradient(120deg,var(--dark) 0%,var(--teal) 70%,var(--teal-light) 100%);border-radius:16px;padding:18px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;color:#fff}
+.brand{display:flex;align-items:center;gap:14px}
+.logo{height:50px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;background:#fff;padding:4px 10px}
+.logo img{max-width:170px;max-height:44px;object-fit:contain;display:block}
+.title-block .title{font-size:19px;font-weight:800;line-height:1.3}
+.title-block .subtitle{font-size:12.5px;opacity:.9;margin-top:5px}
+.pill-time{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);padding:7px 14px;border-radius:20px;font-size:12.5px;flex-shrink:0}
+.src-ok{color:#c9f2c9}
+.src-sample{color:#fde3ad}
+.src-err{color:#ffb3ae}
+
+.top-nav{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+.top-nav button{border:1px solid var(--border);background:#fff;color:var(--dark);padding:9px 18px;border-radius:10px;font-size:13.5px;font-weight:700;cursor:pointer}
+.top-nav button.active{background:var(--dark);color:#fff;border-color:var(--dark)}
+.page{display:none}
+.page.active{display:block}
+
+.sec-h{display:flex;align-items:center;gap:10px;margin:26px 0 12px}
+.sec-h .num{width:24px;height:24px;border-radius:6px;background:var(--dark);color:#fff;font-size:12.5px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sec-h .htext .h{font-size:16px;font-weight:800;color:var(--dark)}
+.sec-h .htext .s{font-size:12.5px;color:var(--muted);margin-top:1px}
+
+.kpi-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:14px}
+.kpi-card{background:linear-gradient(150deg,var(--dark) 0%,var(--teal) 100%);color:#fff;border-radius:14px;padding:16px;min-height:96px}
+.kpi-card .lbl{font-size:10px;opacity:.82;font-weight:700;margin-bottom:6px;letter-spacing:.3px;text-transform:uppercase}
+.kpi-card .val{font-size:20px;font-weight:800}
+.kpi-card .sub{font-size:11px;margin-top:6px;opacity:.85}
+@media(max-width:980px){.kpi-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:620px){.kpi-grid{grid-template-columns:repeat(2,1fr)}}
+
+.panel{background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px 22px;margin-top:16px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+@media(max-width:800px){.two-col{grid-template-columns:1fr}}
+.block-title{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:800;color:var(--purple);margin-bottom:10px;text-transform:uppercase;letter-spacing:.3px}
+.block-title.teal{color:var(--tealbar)}
+.block-title.dark{color:var(--dark)}
+.block-title.red{color:var(--red)}
+.block-title.green{color:var(--green-text)}
+ul.bullets{margin:0;padding-left:18px;font-size:13.4px;line-height:1.75}
+ul.bullets li{margin-bottom:5px}
+ul.bullets b{color:var(--dark)}
+.action-list{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+.action-item{border-left:3px solid var(--tealbar);background:var(--bg);border-radius:8px;padding:11px 14px;font-size:13.4px;line-height:1.55}
+.action-item b{color:var(--dark)}
+
+/* bar charts */
+.tier-bar-block{margin-bottom:16px}
+.tier-bar-block:last-child{margin-bottom:0}
+.tier-bar-title{font-size:13px;font-weight:800;color:var(--dark);margin-bottom:8px}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:7px}
+.bar-row .blabel{width:150px;font-size:11.8px;color:var(--muted);flex-shrink:0}
+.bar-track{flex:1;background:var(--bg);border-radius:6px;height:22px;position:relative;overflow:hidden}
+.bar-fill{height:100%;border-radius:6px;display:flex;align-items:center;justify-content:flex-end;padding-right:9px;color:#fff;font-size:11.5px;font-weight:700;white-space:nowrap}
+
+/* leader compare cards */
+.leader-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+@media(max-width:900px){.leader-grid{grid-template-columns:repeat(2,1fr)}}
+.leader-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+.leader-card .lname{font-size:13.5px;font-weight:800;color:var(--dark);margin-bottom:8px}
+.leader-card .lm{display:flex;justify-content:space-between;font-size:12px;padding:3px 0;color:var(--muted)}
+.leader-card .lm b{color:var(--dark)}
+
+/* podium */
+.podium{display:flex;align-items:flex-end;justify-content:center;gap:14px;margin-top:8px}
+.podium-col{width:180px;text-align:center}
+.podium-col .medal{font-size:26px}
+.podium-col .pname{font-size:13px;font-weight:800;color:var(--dark);margin:6px 0 2px}
+.podium-col .pstats{font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:8px}
+.podium-stand{border-radius:10px 10px 0 0;color:#fff;font-weight:800;display:flex;align-items:flex-start;justify-content:center;padding-top:10px;font-size:15px}
+.rank-1{order:2}.rank-2{order:1}.rank-3{order:3}
+.rank-1 .podium-stand{height:110px;background:linear-gradient(160deg,var(--gold),#a9790f)}
+.rank-2 .podium-stand{height:82px;background:linear-gradient(160deg,var(--silver),#6f7981)}
+.rank-3 .podium-stand{height:60px;background:linear-gradient(160deg,var(--bronze),#8a4a1f)}
+@media(max-width:700px){.podium{flex-wrap:wrap}.rank-1,.rank-2,.rank-3{order:0}}
+
+/* top sale cards */
+.top3-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:800px){.top3-grid{grid-template-columns:1fr}}
+.top3-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;position:relative;overflow:hidden}
+.top3-card .rank-badge{position:absolute;top:0;right:0;background:var(--tealbar);color:#fff;font-size:11px;font-weight:800;padding:4px 10px;border-radius:0 0 0 10px}
+.top3-card .sname{font-size:14.5px;font-weight:800;color:var(--dark);margin-bottom:2px}
+.top3-card .sleader{font-size:11.5px;color:var(--muted);margin-bottom:10px}
+.top3-card .sm{display:flex;justify-content:space-between;font-size:12px;padding:2px 0}
+.top3-card .sm b{color:var(--dark)}
+
+.issue-list{display:flex;flex-direction:column;gap:10px}
+.issue-row{display:flex;gap:10px;align-items:flex-start}
+.issue-row .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:6px;background:var(--red)}
+.issue-row .txt{font-size:13.3px;line-height:1.55}
+.issue-row .txt b{color:var(--dark)}
+.issue-row .sub{color:var(--muted);font-size:12px;margin-top:2px}
+
+.fbar{display:flex;gap:9px;flex-wrap:wrap;align-items:center;background:#fff;border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:14px}
+.fbar label{font-size:11px;color:var(--muted);font-weight:700}
+.fbar select,.fbar input[type=text]{font-size:12.5px;padding:6px 10px;border-radius:7px;border:1px solid var(--border);background:var(--bg);color:var(--text)}
+
+table{width:100%;border-collapse:collapse;font-size:12.6px}
+th{text-align:left;color:var(--muted);font-weight:700;font-size:10.5px;letter-spacing:.3px;text-transform:uppercase;padding:8px 10px;border-bottom:1px solid var(--border);white-space:nowrap;background:var(--bg)}
+th.sortable{cursor:pointer;user-select:none}
+td{padding:9px 10px;border-bottom:1px solid var(--border);white-space:nowrap}
+tr:last-child td{border-bottom:none}
+.chip{background:var(--bg);color:var(--dark);font-weight:700;font-size:11.5px;padding:3px 10px;border-radius:14px;display:inline-block}
+.name-cell{font-weight:700;color:var(--dark)}
+.table-scroll{overflow-x:auto}
+
+footer{text-align:center;color:var(--muted);font-size:11px;margin-top:26px}
+
+/* ===== LAYOUT: sidebar + content ===== */
+.app-layout{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
+.sidebar{position:sticky;top:0;height:100vh;background:linear-gradient(180deg,#0d3b36 0%,#0a2e2a 100%);color:#fff;padding:22px 16px;display:flex;flex-direction:column;gap:4px;overflow-y:auto}
+.sidebar .sblogo{display:flex;flex-direction:column;align-items:flex-start;gap:10px;margin-bottom:10px}
+.sidebar .sblogo img{width:144px;height:auto;border-radius:10px;flex-shrink:0}
+.sidebar .sbtitle{font-size:13px;font-weight:800;line-height:1.25;color:#fff}
+.sidebar .sbsub{font-size:10.5px;color:#9fc7bd;margin-bottom:14px}
+.sidebar hr{border:none;border-top:1px solid rgba(255,255,255,.15);margin:6px 0 12px}
+.sidebar .sec-lbl{font-size:10px;font-weight:700;letter-spacing:1px;color:#7fb0a4;margin:0 0 8px 4px;text-transform:uppercase}
+.sidebar nav{display:flex;flex-direction:column;gap:4px;margin-bottom:18px}
+.sidebar nav button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:11px 12px;border-radius:9px;font-size:13px;font-weight:700;color:#cfe6df;background:transparent;border:none;cursor:pointer}
+.sidebar nav button:hover{background:rgba(255,255,255,.08);color:#fff}
+.sidebar nav button.active{background:var(--teal-light);color:#fff}
+.sidebar .status-box{margin-top:auto;font-size:10.5px;color:#9fc7bd;padding-top:12px;border-top:1px solid rgba(255,255,255,.15)}
+.sidebar .status-box button{width:100%;margin-top:8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);color:#fff;padding:8px 10px;border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer}
+.content{padding:24px 28px 60px;max-width:1400px;margin:0 auto}
+
+.gfilter{display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:18px}
+.gfilter .fg{display:flex;flex-direction:column;gap:4px}
+.gfilter label{font-size:10.5px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+.gfilter select,.gfilter input{font-size:12.5px;padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:#fff;color:var(--text);font-weight:600}
+.gfilter input{min-width:160px}
+.view-toggle{display:flex;gap:6px}
+.view-toggle button{padding:8px 14px;border-radius:9px;border:1px solid var(--border);background:#fff;font-size:12.5px;font-weight:700;color:var(--muted);cursor:pointer}
+.view-toggle button.active{background:var(--teal);color:#fff;border-color:var(--teal)}
+.sort-trend{display:flex;gap:6px;margin-left:auto}
+.sort-trend button{padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:#fff;font-size:12px;font-weight:700;cursor:pointer}
+.sort-trend button.active{background:var(--purple);color:#fff;border-color:var(--purple)}
+.wow{font-size:11px;font-weight:800;padding:2px 7px;border-radius:10px;display:inline-block}
+.wow.up{background:var(--green-bg);color:var(--green-text)}
+.wow.down{background:var(--red-bg);color:var(--red)}
+.wow.flat{background:var(--bg);color:var(--muted)}
+.trend-block{margin-bottom:18px}
+.trend-block:last-child{margin-bottom:0}
+.trend-title{font-size:13px;font-weight:800;color:var(--dark);margin-bottom:8px}
+.trend-row{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.trend-row .wlabel{width:110px;font-size:11.5px;color:var(--muted);flex-shrink:0}
+.trend-row .wlabel.cur{color:var(--dark);font-weight:800}
+th.sortable{cursor:pointer;user-select:none}
+th.sortable:hover{color:var(--dark)}
+th .arrow{font-size:9px;opacity:.6;margin-left:3px}
+td.delta-col,th.delta-col{text-align:right}
+
+/* CR / AOV so với trung bình team */
+.perf-cell{padding:2px 8px;border-radius:6px;font-weight:700;display:inline-block}
+.perf-good{background:var(--green-bg);color:var(--green-text)}
+.perf-mid{background:var(--amber-bg);color:var(--amber-text)}
+.perf-low{background:var(--red-bg);color:var(--red)}
+.legend-perf{display:flex;gap:14px;font-size:11.5px;color:var(--muted);margin-bottom:10px;flex-wrap:wrap}
+.legend-perf span.dot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:middle}
+/* ===== OVERALL & ACTION ===== */
+.oa-card{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:18px;overflow:hidden}
+.oa-bar{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;color:#fff}
+.oa-bar.sev-crit{background:linear-gradient(90deg,#0a2e2a,#1a5c52)}
+.oa-bar.sev-warn{background:linear-gradient(90deg,#0f4f47,#13836f)}
+.oa-bar.sev-ok{background:linear-gradient(90deg,#13836f,#1fae9a)}
+.oa-bar .oa-name{font-size:15px;font-weight:800;display:flex;align-items:center;gap:10px}
+.oa-bar.sev-crit .oa-sev-badge{background:#d9534f;color:#fff}
+.oa-bar.sev-warn .oa-sev-badge{background:#e0a020;color:#fff}
+.oa-sev-badge{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:20px;background:rgba(255,255,255,.22)}
+.oa-bar .oa-meta{font-size:12px;opacity:.95}
+.oa-kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--border)}
+.oa-kpi{background:#fff;padding:12px 14px}
+.oa-kpi .lbl{font-size:10.5px;color:var(--muted);font-weight:700;text-transform:uppercase}
+.oa-kpi .val{font-size:17px;font-weight:800;color:var(--dark);margin-top:2px}
+.oa-body{padding:16px 18px}
+.oa-2col{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:14px}
+.oa-block h5{font-size:12.5px;font-weight:800;color:var(--dark);margin:0 0 8px;display:flex;align-items:center;gap:6px}
+.oa-block ul{margin:0;padding-left:16px;font-size:12.5px;line-height:1.65;color:var(--text)}
+.oa-recheck-item{border-left:3px solid var(--red);background:#fff7f6;border-radius:0 8px 8px 0;padding:8px 12px;margin-bottom:8px}
+.oa-recheck-item .rname{font-weight:800;font-size:13px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.oa-recheck-item .rreason{font-size:12px;color:var(--muted);margin-top:3px}
+.oa-score{font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;color:#fff}
+.oa-score.s-lo{background:var(--green-text)}
+.oa-score.s-mid{background:var(--amber-text)}
+.oa-score.s-hi{background:var(--red)}
+.oa-flag-ao{font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:20px;background:#6a3fa0;color:#fff}
+.oa-status-tag{font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:20px;background:var(--bg);color:var(--muted)}
+.oa-good-item{border-left:3px solid var(--green-text);background:#f4faf4;border-radius:0 8px 8px 0;padding:8px 12px;margin-bottom:8px;font-size:12.5px}
+.oa-good-item b{color:var(--green-text)}
+.oa-actions{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.oa-action-item{border-left:3px solid var(--teal);background:#f2f9f7;border-radius:0 8px 8px 0;padding:8px 12px;font-size:12.5px}
+.oa-note{font-size:11px;color:var(--muted);font-style:italic;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="app-layout">
+
+  <aside class="sidebar">
+    <div class="sblogo">
+      <img src="data:image/png;base64,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">
+      <div>
+        <div class="sbtitle">Năng Suất Sale Vệ Tinh</div>
+      </div>
+    </div>
+    <div class="sbsub">Phòng Kinh doanh Vaccine eCom</div>
+    <hr>
+    <div class="sec-lbl">Loại Dữ Liệu</div>
+    <nav id="typeNav">
+      <button data-type="TongQuan" class="active">📊 Tổng Quan</button>
+      <button data-type="YeuCau">📋 Yêu Cầu</button>
+      <button data-type="VeTinh">🛰️ Vệ Tinh</button>
+      <button data-type="NhacLich">🔔 Nhắc Lịch</button>
+    </nav>
+    <div class="status-box">
+      <div id="sourceStatus">🟡 Đang tải dữ liệu...</div>
+      <div id="lastUpdated" style="margin-top:4px">—</div>
+      <button id="btnRefresh">🔄 Làm mới dữ liệu</button>
+    </div>
+  </aside>
+
+  <div class="content">
+    <div class="header" style="margin-bottom:18px">
+      <div class="brand">
+        <div class="title-block">
+          <div class="title" id="pageTitle">Nhắc Lịch — Phân tích theo Sale / Leader / Nhóm thâm niên</div>
+          <div class="subtitle">Lọc &amp; sắp xếp theo xu hướng tuần, so sánh CR/AOV với trung bình team</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="gfilter">
+      <div class="fg">
+        <label>Tuần</label>
+        <select id="weekSelect"></select>
+      </div>
+      <div class="fg">
+        <label>Xem theo</label>
+        <div class="view-toggle" id="viewToggle">
+          <button data-view="sale" class="active">Từng Sale</button>
+          <button data-view="leader">Từng Leader</button>
+          <button data-view="tenure">Nhóm Thâm Niên</button>
+        </div>
+      </div>
+      <div class="fg">
+        <label>Leader</label>
+        <select id="fLeader"><option value="all">Tất cả</option></select>
+      </div>
+      <div class="fg">
+        <label>Nhóm thâm niên</label>
+        <select id="fTenure">
+          <option value="all">Tất cả</option>
+          <option value="new1">Mới (&lt;3 tháng)</option>
+          <option value="new2">Mới (3-6 tháng)</option>
+          <option value="old">Cũ (&ge;6 tháng)</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>Tìm Sale</label>
+        <input type="text" id="fSearch" placeholder="Nhập tên...">
+      </div>
+      <div class="fg" style="margin-left:auto">
+        <label>Sắp theo xu hướng (so tuần trước)</label>
+        <div class="sort-trend" id="trendSortBtns">
+          <button data-trend="up">▲ Tăng nhiều nhất</button>
+          <button data-trend="down">▼ Giảm nhiều nhất</button>
+          <button data-trend="off" class="active">Tắt</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-h"><div class="num">1</div><div class="htext"><div class="h" id="kpiTitle">Tổng Quan — Nhắc Lịch</div><div class="s" id="kpiSub">Toàn hệ thống</div></div></div>
+    <div class="kpi-grid" id="kpiGrid"></div>
+
+    <div class="sec-h"><div class="num">2</div><div class="htext"><div class="h">Xu Hướng CHBH &amp; Doanh Số Qua 3 Tuần</div><div class="s">Toàn team, theo loại dữ liệu đang chọn</div></div></div>
+    <div class="panel" id="trendPanel1"></div>
+
+    <div class="sec-h"><div class="num">3</div><div class="htext"><div class="h">Xu Hướng ĐHĐL/CHBH &amp; CR Qua 3 Tuần</div><div class="s">Chất lượng chuyển đổi toàn team</div></div></div>
+    <div class="panel" id="trendPanel2"></div>
+
+    <div class="sec-h"><div class="num">4</div><div class="htext"><div class="h" id="tableTitle">Bảng Chi Tiết Theo Sale</div><div class="s">Bấm tiêu đề cột để sắp xếp Cao→Thấp / Thấp→Cao, hoặc dùng nút xu hướng ở trên</div></div></div>
+    <div class="legend-perf">
+      <span><span class="dot" style="background:var(--green-bg);border:1px solid var(--green-text)"></span>CR/AOV cao hơn TB team (≥ +10%)</span>
+      <span><span class="dot" style="background:var(--amber-bg);border:1px solid var(--amber-text)"></span>Xấp xỉ TB team (±10%)</span>
+      <span><span class="dot" style="background:var(--red-bg);border:1px solid var(--red)"></span>Thấp hơn TB team (≤ -10%)</span>
+    </div>
+    <div class="panel table-scroll">
+      <table>
+        <thead><tr id="tableHeadRow"></tr></thead>
+        <tbody id="mainTableBody"></tbody>
+      </table>
+    </div>
+
+    <div class="sec-h"><div class="num">5</div><div class="htext"><div class="h" id="oaTitle">Overall &amp; Action</div><div class="s">Tổng hợp theo Leader: chất lượng xử lý + kết quả doanh số + hành động đề xuất</div></div></div>
+    <div class="view-toggle" id="oaSevFilter" style="margin-bottom:14px">
+      <button data-sev="all" class="active">Tất cả</button>
+      <button data-sev="crit">Nghiêm trọng</button>
+      <button data-sev="warn">Cần chú ý</button>
+    </div>
+    <div id="overallActionWrap"></div>
+
+    <footer>Dashboard nội bộ Sale Vệ Tinh · Nguồn: Google Sheet "Năng Suất Vệ Tinh Theo Tuần" (Yêu Cầu · Vệ Tinh · Nhắc Lịch · Nhân sự) · CR = ĐHTC/CHBH · Δ = so tuần liền trước</footer>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   CONFIG — 4 nguồn theo GID xác nhận từ ảnh chụp thực tế:
+     Yêu Cầu   -> gid=0
+     Vệ Tinh   -> gid=2059344527
+     Nhắc Lịch -> gid=259116423
+     Nhân sự   -> gid=1366678985
+   ============================================================ */
+const SHEET_ID = "1fW9133IaUF2_M_4uZqvCBH0XkrosXxEfPKl2PQqqCAg";
+/* Sheet đã "Xuất bản lên web" — ID xuất bản (khác ID Sheet gốc) lấy từ link:
+   https://docs.google.com/spreadsheets/d/e/PUB_ID/pubhtml */
+const PUB_ID = "2PACX-1vSofjp9MmLPU258YjLB3aIDYjJkoI1QkC0hvfwsARbUx6j5gR3UZhlhGNDjojfpBbl9dFecc7psKOQa";
+/* Apps Script Web App — đã xác nhận hoạt động (trả về CSV thật) qua trình duyệt thật.
+   Dùng làm nguồn chính vì có CORS ổn định, không phụ thuộc "Xuất bản lên web" của Sheet. */
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw9oo83-5uwVHglgagvhS8VCtETn2T9qFEvtDYZ1383cy0RvhEozOmw0Oa6Np6iRtig/exec";
+const CONFIG = {
+  YeuCau:   APPS_SCRIPT_URL+"?gid=0",
+  VeTinh:   APPS_SCRIPT_URL+"?gid=2059344527",
+  NhacLich: APPS_SCRIPT_URL+"?gid=259116423",
+  NhanSu:   APPS_SCRIPT_URL+"?gid=1366678985"
+};
+/* URL dự phòng bậc 2 (Sheet bản xuất bản lên web) — dùng nếu Apps Script tạm lỗi. */
+const CONFIG_PUB = {
+  YeuCau:   "https://docs.google.com/spreadsheets/d/e/"+PUB_ID+"/pub?gid=0&single=true&output=csv",
+  VeTinh:   "https://docs.google.com/spreadsheets/d/e/"+PUB_ID+"/pub?gid=2059344527&single=true&output=csv",
+  NhacLich: "https://docs.google.com/spreadsheets/d/e/"+PUB_ID+"/pub?gid=259116423&single=true&output=csv",
+  NhanSu:   "https://docs.google.com/spreadsheets/d/e/"+PUB_ID+"/pub?gid=1366678985&single=true&output=csv"
+};
+/* URL dự phòng (endpoint theo ID Sheet gốc, không phải bản xuất bản) —
+   dùng khi endpoint xuất bản gặp sự cố tạm thời. */
+const CONFIG_FALLBACK = {
+  YeuCau:   "https://docs.google.com/spreadsheets/d/"+SHEET_ID+"/gviz/tq?tqx=out:csv&gid=0",
+  VeTinh:   "https://docs.google.com/spreadsheets/d/"+SHEET_ID+"/gviz/tq?tqx=out:csv&gid=2059344527",
+  NhacLich: "https://docs.google.com/spreadsheets/d/"+SHEET_ID+"/gviz/tq?tqx=out:csv&gid=259116423",
+  NhanSu:   "https://docs.google.com/spreadsheets/d/"+SHEET_ID+"/gviz/tq?tqx=out:csv&gid=1366678985"
+};
+let FETCH_DIAGNOSTIC = {}; /* type -> lý do fail cuối cùng, hiển thị cho người dùng */
+
+const STATIC_ALL = [{"type": "YeuCau", "week": "W-2", "email": "NGUYENHT37", "leader": "HANLNG2", "chbh": 74, "dhdl": 49, "dhtc": 41, "doanhso": 177062970, "aov": 4318609, "name": "Hoàng Thảo Nguyên"}, {"type": "YeuCau", "week": "W-2", "email": "MYCA", "leader": "HATTT39", "chbh": 54, "dhdl": 33, "dhtc": 23, "doanhso": 101314130, "aov": 4404962, "name": "Châu Ái My"}, {"type": "YeuCau", "week": "W-2", "email": "KHOINT20", "leader": "HANLNG2", "chbh": 92, "dhdl": 52, "dhtc": 35, "doanhso": 94063094, "aov": 2687517, "name": "Nguyễn Thành Khôi"}, {"type": "YeuCau", "week": "W-2", "email": "LINHPTT43", "leader": "TRONGND15", "chbh": 53, "dhdl": 39, "dhtc": 26, "doanhso": 92410850, "aov": 3554263, "name": "Phạm Thị Trúc Linh"}, {"type": "YeuCau", "week": "W-2", "email": "GIANGLT39", "leader": "TRONGND15", "chbh": 67, "dhdl": 44, "dhtc": 21, "doanhso": 88829180, "aov": 4229961, "name": "Lê Trường Giang"}, {"type": "YeuCau", "week": "W-2", "email": "TRANGPTK13", "leader": "HANP8", "chbh": 48, "dhdl": 23, "dhtc": 19, "doanhso": 85485550, "aov": 4499239, "name": "Phù Thị Kim Trang"}, {"type": "YeuCau", "week": "W-2", "email": "LOANVTN", "leader": "TRONGND15", "chbh": 53, "dhdl": 43, "dhtc": 25, "doanhso": 84447340, "aov": 3377894, "name": "Võ Thị Ngọc Loan"}, {"type": "YeuCau", "week": "W-2", "email": "LINHCTM2", "leader": "TRONGND15", "chbh": 67, "dhdl": 40, "dhtc": 34, "doanhso": 83412040, "aov": 2453295, "name": "Châu Thị Mỹ Linh"}, {"type": "YeuCau", "week": "W-2", "email": "NHULQ9", "leader": "HATTT39", "chbh": 76, "dhdl": 47, "dhtc": 38, "doanhso": 73411510, "aov": 10487359, "name": "Lê Quỳnh Như"}, {"type": "YeuCau", "week": "W-2", "email": "THAIVH13", "leader": "HATTT39", "chbh": 62, "dhdl": 32, "dhtc": 18, "doanhso": 69741650, "aov": 3788419, "name": "Võ Hoàng Thái"}, {"type": "YeuCau", "week": "W-2", "email": "TRANDTN2", "leader": "HATTT39", "chbh": 31, "dhdl": 17, "dhtc": 16, "doanhso": 63929800, "aov": 3995613, "name": "Đoàn Thị Ngọc Trân"}, {"type": "YeuCau", "week": "W-2", "email": "HIEUTQ18", "leader": "HATTT39", "chbh": 50, "dhdl": 20, "dhtc": 15, "doanhso": 62514902, "aov": 4167660, "name": "Trương Quang Hiếu"}, {"type": "YeuCau", "week": "W-2", "email": "THANHPTT5", "leader": "HANLNG2", "chbh": 69, "dhdl": 46, "dhtc": 18, "doanhso": 58229910, "aov": 3234995, "name": "Phan Thị Thanh Thanh"}, {"type": "YeuCau", "week": "W-2", "email": "NHIKH", "leader": "HANLNG2", "chbh": 49, "dhdl": 37, "dhtc": 19, "doanhso": 54730690, "aov": 2880563, "name": "Kha Huệ Nhi"}, {"type": "YeuCau", "week": "W-2", "email": "DUNGNTN9", "leader": "HANP8", "chbh": 44, "dhdl": 19, "dhtc": 13, "doanhso": 53307700, "aov": 4100592, "name": "Nguyễn Thị Ngọc Dung"}, {"type": "YeuCau", "week": "W-2", "email": "DUYENDTM24", "leader": "TRONGND15", "chbh": 52, "dhdl": 26, "dhtc": 17, "doanhso": 51754590, "aov": 3044388, "name": "Đào Thị Mỹ Duyên"}, {"type": "YeuCau", "week": "W-2", "email": "THULHA3", "leader": "TRONGND15", "chbh": 72, "dhdl": 36, "dhtc": 23, "doanhso": 50629350, "aov": 2201276, "name": "Lê Hồng Anh Thư"}, {"type": "YeuCau", "week": "W-2", "email": "KIMNHM", "leader": "TRONGND15", "chbh": 59, "dhdl": 29, "dhtc": 21, "doanhso": 48282240, "aov": 2299154, "name": "Nguyễn Huỳnh Mỹ Kim"}, {"type": "YeuCau", "week": "W-2", "email": "NGUYENNA16", "leader": "HATTT39", "chbh": 53, "dhdl": 29, "dhtc": 17, "doanhso": 47277650, "aov": 2781038, "name": "Nguyễn Anh Nguyên"}, {"type": "YeuCau", "week": "W-2", "email": "PHUONGDH24", "leader": "HATTT39", "chbh": 57, "dhdl": 40, "dhtc": 22, "doanhso": 45481830, "aov": 2067356, "name": "Dương Hồng Phượng"}, {"type": "YeuCau", "week": "W-2", "email": "TAMTNX2", "leader": "HANLNG2", "chbh": 47, "dhdl": 14, "dhtc": 16, "doanhso": 42605750, "aov": 2662859, "name": "Tôn Nữ Xuân Tâm"}, {"type": "YeuCau", "week": "W-2", "email": "THUATVH2", "leader": "HATTT39", "chbh": 29, "dhdl": 13, "dhtc": 15, "doanhso": 28887950, "aov": 1925863, "name": "Võ Huỳnh Thuật"}, {"type": "YeuCau", "week": "W-2", "email": "DUYENNMN2", "leader": "HANP8", "chbh": 18, "dhdl": 7, "dhtc": 9, "doanhso": 22068834, "aov": 2452093, "name": "Nguyễn Mỹ Ngọc Duyên"}, {"type": "YeuCau", "week": "W-2", "email": "NHUTK4", "leader": "HANLNG2", "chbh": 48, "dhdl": 13, "dhtc": 13, "doanhso": 22004100, "aov": 1692623, "name": "Trần Kim Như"}, {"type": "YeuCau", "week": "W-2", "email": "OWENNVMC", "leader": "HANP8", "chbh": 64, "dhdl": 19, "dhtc": 7, "doanhso": 18938400, "aov": 2705486, "name": "Nguyễn Văn Mai Cơ Owen"}, {"type": "YeuCau", "week": "W-2", "email": "THAOBT8", "leader": "HANP8", "chbh": 44, "dhdl": 20, "dhtc": 9, "doanhso": 9579620, "aov": 1064402, "name": "Bùi Thái Thảo"}, {"type": "YeuCau", "week": "W-1", "email": "NGUYENHT37", "leader": "HANLNG2", "chbh": 126, "dhdl": 70, "dhtc": 42, "doanhso": 135023030, "aov": 3214838, "name": "Hoàng Thảo Nguyên"}, {"type": "YeuCau", "week": "W-1", "email": "LINHCTM2", "leader": "TRONGND15", "chbh": 70, "dhdl": 39, "dhtc": 22, "doanhso": 98203560, "aov": 4463798, "name": "Châu Thị Mỹ Linh"}, {"type": "YeuCau", "week": "W-1", "email": "THAOBT8", "leader": "HANP8", "chbh": 56, "dhdl": 37, "dhtc": 27, "doanhso": 82973170, "aov": 3073080, "name": "Bùi Thái Thảo"}, {"type": "YeuCau", "week": "W-1", "email": "NHULQ9", "leader": "HATTT39", "chbh": 84, "dhdl": 56, "dhtc": 29, "doanhso": 78006200, "aov": 11143743, "name": "Lê Quỳnh Như"}, {"type": "YeuCau", "week": "W-1", "email": "KHOINT20", "leader": "HANLNG2", "chbh": 102, "dhdl": 61, "dhtc": 27, "doanhso": 76352530, "aov": 2827871, "name": "Nguyễn Thành Khôi"}, {"type": "YeuCau", "week": "W-1", "email": "THAIVH13", "leader": "HATTT39", "chbh": 113, "dhdl": 62, "dhtc": 28, "doanhso": 72084390, "aov": 2574443, "name": "Võ Hoàng Thái"}, {"type": "YeuCau", "week": "W-1", "email": "DUYENNMN2", "leader": "HANP8", "chbh": 62, "dhdl": 35, "dhtc": 12, "doanhso": 71396300, "aov": 5949692, "name": "Nguyễn Mỹ Ngọc Duyên"}, {"type": "YeuCau", "week": "W-1", "email": "LOANVTN", "leader": "TRONGND15", "chbh": 77, "dhdl": 46, "dhtc": 22, "doanhso": 67740790, "aov": 3079127, "name": "Võ Thị Ngọc Loan"}, {"type": "YeuCau", "week": "W-1", "email": "LINHPTT43", "leader": "TRONGND15", "chbh": 90, "dhdl": 61, "dhtc": 21, "doanhso": 67555460, "aov": 3216927, "name": "Phạm Thị Trúc Linh"}, {"type": "VeTinh", "week": "W-2", "email": "NGUYENHT37", "leader": "HANLNG2", "chbh": 619, "dhdl": 142, "dhtc": 86, "doanhso": 267355820, "aov": 3108789, "name": "Hoàng Thảo Nguyên"}, {"type": "VeTinh", "week": "W-2", "email": "THAIVH13", "leader": "HATTT39", "chbh": 522, "dhdl": 274, "dhtc": 78, "doanhso": 197696914, "aov": 2534576, "name": "Võ Hoàng Thái"}, {"type": "VeTinh", "week": "W-2", "email": "KIMNHM", "leader": "TRONGND15", "chbh": 461, "dhdl": 152, "dhtc": 74, "doanhso": 196287310, "aov": 2652531, "name": "Nguyễn Huỳnh Mỹ Kim"}, {"type": "VeTinh", "week": "W-2", "email": "DUYENDTM24", "leader": "TRONGND15", "chbh": 467, "dhdl": 145, "dhtc": 57, "doanhso": 193858960, "aov": 3401034, "name": "Đào Thị Mỹ Duyên"}, {"type": "VeTinh", "week": "W-2", "email": "GIANGLT39", "leader": "TRONGND15", "chbh": 454, "dhdl": 166, "dhtc": 64, "doanhso": 188859600, "aov": 2950931, "name": "Lê Trường Giang"}, {"type": "VeTinh", "week": "W-2", "email": "TAMTNX2", "leader": "HANLNG2", "chbh": 400, "dhdl": 110, "dhtc": 77, "doanhso": 184151060, "aov": 2391572, "name": "Tôn Nữ Xuân Tâm"}, {"type": "VeTinh", "week": "W-2", "email": "NGUYENNA16", "leader": "HATTT39", "chbh": 544, "dhdl": 159, "dhtc": 62, "doanhso": 183572790, "aov": 2960851, "name": "Nguyễn Anh Nguyên"}, {"type": "VeTinh", "week": "W-2", "email": "LINHPTT43", "leader": "TRONGND15", "chbh": 397, "dhdl": 121, "dhtc": 58, "doanhso": 176332804, "aov": 3040221, "name": "Phạm Thị Trúc Linh"}, {"type": "VeTinh", "week": "W-2", "email": "KHOINT20", "leader": "HANLNG2", "chbh": 599, "dhdl": 180, "dhtc": 67, "doanhso": 165644772, "aov": 2472310, "name": "Nguyễn Thành Khôi"}, {"type": "VeTinh", "week": "W-2", "email": "LOANVTN", "leader": "TRONGND15", "chbh": 353, "dhdl": 154, "dhtc": 56, "doanhso": 164254260, "aov": 2933112, "name": "Võ Thị Ngọc Loan"}, {"type": "VeTinh", "week": "W-2", "email": "TRANGPTK13", "leader": "HANP8", "chbh": 554, "dhdl": 174, "dhtc": 65, "doanhso": 162486010, "aov": 2499785, "name": "Phù Thị Kim Trang"}, {"type": "VeTinh", "week": "W-2", "email": "LINHCTM2", "leader": "TRONGND15", "chbh": 478, "dhdl": 135, "dhtc": 57, "doanhso": 161402420, "aov": 2831621, "name": "Châu Thị Mỹ Linh"}, {"type": "VeTinh", "week": "W-2", "email": "THUATVH2", "leader": "HATTT39", "chbh": 575, "dhdl": 204, "dhtc": 67, "doanhso": 159686320, "aov": 2383378, "name": "Võ Huỳnh Thuật"}, {"type": "VeTinh", "week": "W-2", "email": "THANHPTT5", "leader": "HANLNG2", "chbh": 550, "dhdl": 172, "dhtc": 44, "doanhso": 158048352, "aov": 3592008, "name": "Phan Thị Thanh Thanh"}, {"type": "VeTinh", "week": "W-2", "email": "PHUONGDH24", "leader": "HATTT39", "chbh": 525, "dhdl": 135, "dhtc": 53, "doanhso": 154009520, "aov": 2905840, "name": "Dương Hồng Phượng"}, {"type": "VeTinh", "week": "W-2", "email": "TRANDTN2", "leader": "HATTT39", "chbh": 465, "dhdl": 137, "dhtc": 64, "doanhso": 149086400, "aov": 2329475, "name": "Đoàn Thị Ngọc Trân"}, {"type": "VeTinh", "week": "W-2", "email": "DUYENNMN2", "leader": "HANP8", "chbh": 92, "dhdl": 52, "dhtc": 59, "doanhso": 146107250, "aov": 2476394, "name": "Nguyễn Mỹ Ngọc Duyên"}, {"type": "VeTinh", "week": "W-2", "email": "NHIKH", "leader": "HANLNG2", "chbh": 479, "dhdl": 171, "dhtc": 46, "doanhso": 144462070, "aov": 3140480, "name": "Kha Huệ Nhi"}, {"type": "VeTinh", "week": "W-2", "email": "THAOBT8", "leader": "HANP8", "chbh": 520, "dhdl": 141, "dhtc": 35, "doanhso": 139412050, "aov": 3983201, "name": "Bùi Thái Thảo"}, {"type": "VeTinh", "week": "W-2", "email": "HIEUTQ18", "leader": "HATTT39", "chbh": 537, "dhdl": 159, "dhtc": 45, "doanhso": 128571004, "aov": 2857133, "name": "Trương Quang Hiếu"}, {"type": "VeTinh", "week": "W-2", "email": "MYCA", "leader": "HATTT39", "chbh": 415, "dhdl": 106, "dhtc": 51, "doanhso": 124726720, "aov": 2445622, "name": "Châu Ái My"}, {"type": "VeTinh", "week": "W-2", "email": "THULHA3", "leader": "TRONGND15", "chbh": 437, "dhdl": 91, "dhtc": 59, "doanhso": 121592818, "aov": 2060895, "name": "Lê Hồng Anh Thư"}, {"type": "VeTinh", "week": "W-2", "email": "NHULQ9", "leader": "HATTT39", "chbh": 367, "dhdl": 101, "dhtc": 54, "doanhso": 120649630, "aov": 2234252, "name": "Lê Quỳnh Như"}, {"type": "VeTinh", "week": "W-2", "email": "DUNGNTN9", "leader": "HANP8", "chbh": 433, "dhdl": 104, "dhtc": 42, "doanhso": 116675330, "aov": 2777984, "name": "Nguyễn Thị Ngọc Dung"}, {"type": "VeTinh", "week": "W-2", "email": "OWENNVMC", "leader": "HANP8", "chbh": 373, "dhdl": 97, "dhtc": 39, "doanhso": 116648384, "aov": 2990984, "name": "Nguyễn Văn Mai Cơ Owen"}, {"type": "VeTinh", "week": "W-2", "email": "NHUTK4", "leader": "HANLNG2", "chbh": 393, "dhdl": 90, "dhtc": 44, "doanhso": 95509702, "aov": 2170675, "name": "Trần Kim Như"}, {"type": "VeTinh", "week": "W-1", "email": "NGUYENHT37", "leader": "HANLNG2", "chbh": 1193, "dhdl": 272, "dhtc": 87, "doanhso": 274891910, "aov": 3159677, "name": "Hoàng Thảo Nguyên"}, {"type": "VeTinh", "week": "W-1", "email": "THAIVH13", "leader": "HATTT39", "chbh": 933, "dhdl": 293, "dhtc": 93, "doanhso": 274722310, "aov": 2954003, "name": "Võ Hoàng Thái"}, {"type": "VeTinh", "week": "W-1", "email": "LOANVTN", "leader": "TRONGND15", "chbh": 879, "dhdl": 247, "dhtc": 78, "doanhso": 259691490, "aov": 3329378, "name": "Võ Thị Ngọc Loan"}, {"type": "VeTinh", "week": "W-1", "email": "KHOINT20", "leader": "HANLNG2", "chbh": 937, "dhdl": 220, "dhtc": 104, "doanhso": 247202830, "aov": 2376950, "name": "Nguyễn Thành Khôi"}, {"type": "VeTinh", "week": "W-1", "email": "THUATVH2", "leader": "HATTT39", "chbh": 742, "dhdl": 167, "dhtc": 74, "doanhso": 220945750, "aov": 2985753, "name": "Võ Huỳnh Thuật"}, {"type": "VeTinh", "week": "W-1", "email": "TRANGPTK13", "leader": "HANP8", "chbh": 865, "dhdl": 234, "dhtc": 77, "doanhso": 215893680, "aov": 2803814, "name": "Phù Thị Kim Trang"}, {"type": "VeTinh", "week": "W-1", "email": "NHUTK4", "leader": "HANLNG2", "chbh": 761, "dhdl": 130, "dhtc": 73, "doanhso": 214109110, "aov": 2933002, "name": "Trần Kim Như"}, {"type": "VeTinh", "week": "W-1", "email": "PHUONGDH24", "leader": "HATTT39", "chbh": 697, "dhdl": 162, "dhtc": 55, "doanhso": 209788830, "aov": 3814842, "name": "Dương Hồng Phượng"}, {"type": "VeTinh", "week": "W-1", "email": "MYCA", "leader": "HATTT39", "chbh": 657, "dhdl": 129, "dhtc": 64, "doanhso": 195212390, "aov": 3050194, "name": "Châu Ái My"}, {"week": "W-2", "email": "NGUYENHT37", "leader": "HANLNG2", "chbh": 537, "dhdl": 206, "dhtc": 77, "doanhso": 147417420, "aov": 1914512, "name": "Hoàng Thảo Nguyên", "type": "NhacLich"}, {"week": "W-2", "email": "THUATVH2", "leader": "HATTT39", "chbh": 671, "dhdl": 241, "dhtc": 87, "doanhso": 144366650, "aov": 1659387, "name": "Võ Huỳnh Thuật", "type": "NhacLich"}, {"week": "W-2", "email": "KHOINT20", "leader": "HANLNG2", "chbh": 592, "dhdl": 209, "dhtc": 94, "doanhso": 130135320, "aov": 1384418, "name": "Nguyễn Thành Khôi", "type": "NhacLich"}, {"week": "W-2", "email": "TAMTNX2", "leader": "HANLNG2", "chbh": 688, "dhdl": 169, "dhtc": 64, "doanhso": 123175150, "aov": 1924612, "name": "Tôn Nữ Xuân Tâm", "type": "NhacLich"}, {"week": "W-2", "email": "MYCA", "leader": "HATTT39", "chbh": 612, "dhdl": 171, "dhtc": 74, "doanhso": 122556670, "aov": 1656171, "name": "Châu Ái My", "type": "NhacLich"}, {"week": "W-2", "email": "THAIVH13", "leader": "HATTT39", "chbh": 488, "dhdl": 187, "dhtc": 69, "doanhso": 121743890, "aov": 1764404, "name": "Võ Hoàng Thái", "type": "NhacLich"}, {"week": "W-2", "email": "GIANGLT39", "leader": "TRONGND15", "chbh": 674, "dhdl": 237, "dhtc": 72, "doanhso": 119410280, "aov": 1658476, "name": "Lê Trường Giang", "type": "NhacLich"}, {"week": "W-2", "email": "DUYENDTM24", "leader": "TRONGND15", "chbh": 674, "dhdl": 220, "dhtc": 71, "doanhso": 115317160, "aov": 1624185, "name": "Đào Thị Mỹ Duyên", "type": "NhacLich"}, {"week": "W-2", "email": "DUYENNMN2", "leader": "HANP8", "chbh": 351, "dhdl": 85, "dhtc": 66, "doanhso": 112685322, "aov": 1707353, "name": "Nguyễn Mỹ Ngọc Duyên", "type": "NhacLich"}, {"week": "W-2", "email": "NGUYENNA16", "leader": "HATTT39", "chbh": 528, "dhdl": 169, "dhtc": 64, "doanhso": 109172100, "aov": 1705814, "name": "Nguyễn Anh Nguyên", "type": "NhacLich"}, {"week": "W-2", "email": "LINHPTT43", "leader": "TRONGND15", "chbh": 693, "dhdl": 199, "dhtc": 80, "doanhso": 104301340, "aov": 1303767, "name": "Phạm Thị Trúc Linh", "type": "NhacLich"}, {"week": "W-2", "email": "TRANDTN2", "leader": "HATTT39", "chbh": 656, "dhdl": 191, "dhtc": 67, "doanhso": 104089750, "aov": 1553578, "name": "Đoàn Thị Ngọc Trân", "type": "NhacLich"}, {"week": "W-2", "email": "THANHPTT5", "leader": "HANLNG2", "chbh": 677, "dhdl": 227, "dhtc": 69, "doanhso": 104068010, "aov": 1508232, "name": "Phan Thị Thanh Thanh", "type": "NhacLich"}, {"week": "W-2", "email": "LOANVTN", "leader": "TRONGND15", "chbh": 499, "dhdl": 165, "dhtc": 63, "doanhso": 102094310, "aov": 1620545, "name": "Võ Thị Ngọc Loan", "type": "NhacLich"}, {"week": "W-2", "email": "TRANGPTK13", "leader": "HANP8", "chbh": 790, "dhdl": 216, "dhtc": 71, "doanhso": 99338190, "aov": 1399129, "name": "Phù Thị Kim Trang", "type": "NhacLich"}, {"week": "W-2", "email": "THULHA3", "leader": "TRONGND15", "chbh": 708, "dhdl": 168, "dhtc": 50, "doanhso": 92421460, "aov": 1848429, "name": "Lê Hồng Anh Thư", "type": "NhacLich"}, {"week": "W-2", "email": "PHUONGDH24", "leader": "HATTT39", "chbh": 558, "dhdl": 126, "dhtc": 54, "doanhso": 90844770, "aov": 1682311, "name": "Dương Hồng Phượng", "type": "NhacLich"}, {"week": "W-2", "email": "OWENNVMC", "leader": "HANP8", "chbh": 723, "dhdl": 174, "dhtc": 48, "doanhso": 89952070, "aov": 1874001, "name": "Nguyễn Văn Mai Cơ Owen", "type": "NhacLich"}, {"week": "W-2", "email": "LINHCTM2", "leader": "TRONGND15", "chbh": 658, "dhdl": 186, "dhtc": 57, "doanhso": 89608080, "aov": 1572072, "name": "Châu Thị Mỹ Linh", "type": "NhacLich"}, {"week": "W-2", "email": "NHIKH", "leader": "HANLNG2", "chbh": 762, "dhdl": 201, "dhtc": 60, "doanhso": 89182180, "aov": 1486370, "name": "Kha Huệ Nhi", "type": "NhacLich"}, {"week": "W-2", "email": "THAOBT8", "leader": "HANP8", "chbh": 785, "dhdl": 176, "dhtc": 61, "doanhso": 85444410, "aov": 1400728, "name": "Bùi Thái Thảo", "type": "NhacLich"}, {"week": "W-2", "email": "NHUTK4", "leader": "HANLNG2", "chbh": 591, "dhdl": 154, "dhtc": 59, "doanhso": 84512460, "aov": 1432415, "name": "Trần Kim Như", "type": "NhacLich"}, {"week": "W-2", "email": "KIMNHM", "leader": "TRONGND15", "chbh": 629, "dhdl": 170, "dhtc": 59, "doanhso": 74695960, "aov": 1266033, "name": "Nguyễn Huỳnh Mỹ Kim", "type": "NhacLich"}, {"week": "W-2", "email": "HIEUTQ18", "leader": "HATTT39", "chbh": 652, "dhdl": 152, "dhtc": 55, "doanhso": 70461210, "aov": 1281113, "name": "Trương Quang Hiếu", "type": "NhacLich"}, {"week": "W-2", "email": "NHULQ9", "leader": "HATTT39", "chbh": 527, "dhdl": 128, "dhtc": 48, "doanhso": 67761510, "aov": 1411698, "name": "Lê Quỳnh Như", "type": "NhacLich"}, {"week": "W-2", "email": "DUNGNTN9", "leader": "HANP8", "chbh": 679, "dhdl": 178, "dhtc": 45, "doanhso": 65359510, "aov": 1452434, "name": "Nguyễn Thị Ngọc Dung", "type": "NhacLich"}, {"week": "W-2", "email": "MYLTT17", "leader": "HANP8", "chbh": 145, "dhdl": 0, "dhtc": 0, "doanhso": 0, "aov": 0, "name": "Lê Thị Thảo My", "type": "NhacLich"}, {"week": "W-2", "email": "VYNT46", "leader": "HANP8", "chbh": 116, "dhdl": 0, "dhtc": 0, "doanhso": 0, "aov": 0, "name": "Ngô Triệu Vy", "type": "NhacLich"}, {"week": "W-1", "email": "THUATVH2", "leader": "HATTT39", "chbh": 581, "dhdl": 187, "dhtc": 108, "doanhso": 186502840, "aov": 1726878, "name": "Võ Huỳnh Thuật", "type": "NhacLich"}, {"week": "W-1", "email": "TRANDTN2", "leader": "HATTT39", "chbh": 645, "dhdl": 207, "dhtc": 92, "doanhso": 181273580, "aov": 1970365, "name": "Đoàn Thị Ngọc Trân", "type": "NhacLich"}, {"week": "W-1", "email": "KHOINT20", "leader": "HANLNG2", "chbh": 599, "dhdl": 249, "dhtc": 97, "doanhso": 162815910, "aov": 1678515, "name": "Nguyễn Thành Khôi", "type": "NhacLich"}, {"week": "W-1", "email": "GIANGLT39", "leader": "TRONGND15", "chbh": 595, "dhdl": 257, "dhtc": 98, "doanhso": 153742990, "aov": 1568806, "name": "Lê Trường Giang", "type": "NhacLich"}, {"week": "W-1", "email": "NGUYENHT37", "leader": "HANLNG2", "chbh": 492, "dhdl": 172, "dhtc": 90, "doanhso": 141914310, "aov": 1576826, "name": "Hoàng Thảo Nguyên", "type": "NhacLich"}, {"week": "W-1", "email": "MYCA", "leader": "HATTT39", "chbh": 612, "dhdl": 219, "dhtc": 84, "doanhso": 125390510, "aov": 1492744, "name": "Châu Ái My", "type": "NhacLich"}, {"week": "W-1", "email": "NGUYENNA16", "leader": "HATTT39", "chbh": 480, "dhdl": 156, "dhtc": 68, "doanhso": 118375910, "aov": 1740822, "name": "Nguyễn Anh Nguyên", "type": "NhacLich"}, {"week": "W-1", "email": "DUYENDTM24", "leader": "TRONGND15", "chbh": 540, "dhdl": 174, "dhtc": 70, "doanhso": 115595030, "aov": 1651358, "name": "Đào Thị Mỹ Duyên", "type": "NhacLich"}, {"week": "W-1", "email": "DUNGNTN9", "leader": "HANP8", "chbh": 566, "dhdl": 187, "dhtc": 67, "doanhso": 111776580, "aov": 1668307, "name": "Nguyễn Thị Ngọc Dung", "type": "NhacLich"}, {"week": "W-1", "email": "THANHPTT5", "leader": "HANLNG2", "chbh": 608, "dhdl": 192, "dhtc": 82, "doanhso": 111403600, "aov": 1358580, "name": "Phan Thị Thanh Thanh", "type": "NhacLich"}, {"week": "W-1", "email": "NHIKH", "leader": "HANLNG2", "chbh": 641, "dhdl": 187, "dhtc": 64, "doanhso": 109525410, "aov": 1711335, "name": "Kha Huệ Nhi", "type": "NhacLich"}, {"week": "W-1", "email": "THAOBT8", "leader": "HANP8", "chbh": 629, "dhdl": 139, "dhtc": 62, "doanhso": 105718420, "aov": 1705136, "name": "Bùi Thái Thảo", "type": "NhacLich"}, {"week": "W-1", "email": "THAIVH13", "leader": "HATTT39", "chbh": 485, "dhdl": 181, "dhtc": 71, "doanhso": 104630050, "aov": 1473663, "name": "Võ Hoàng Thái", "type": "NhacLich"}, {"week": "W-1", "email": "LINHPTT43", "leader": "TRONGND15", "chbh": 706, "dhdl": 216, "dhtc": 85, "doanhso": 104319050, "aov": 1227283, "name": "Phạm Thị Trúc Linh", "type": "NhacLich"}, {"week": "W-1", "email": "LOANVTN", "leader": "TRONGND15", "chbh": 532, "dhdl": 171, "dhtc": 59, "doanhso": 99026700, "aov": 1678419, "name": "Võ Thị Ngọc Loan", "type": "NhacLich"}, {"week": "W-1", "email": "OWENNVMC", "leader": "HANP8", "chbh": 567, "dhdl": 155, "dhtc": 61, "doanhso": 95732770, "aov": 1569390, "name": "Nguyễn Văn Mai Cơ Owen", "type": "NhacLich"}, {"week": "W-1", "email": "NHUTK4", "leader": "HANLNG2", "chbh": 549, "dhdl": 160, "dhtc": 67, "doanhso": 89724430, "aov": 1339171, "name": "Trần Kim Như", "type": "NhacLich"}, {"week": "W-1", "email": "LINHCTM2", "leader": "TRONGND15", "chbh": 602, "dhdl": 205, "dhtc": 60, "doanhso": 88981860, "aov": 1483031, "name": "Châu Thị Mỹ Linh", "type": "NhacLich"}, {"week": "W-1", "email": "DUYENNMN2", "leader": "HANP8", "chbh": 568, "dhdl": 172, "dhtc": 59, "doanhso": 88485370, "aov": 1499752, "name": "Nguyễn Mỹ Ngọc Duyên", "type": "NhacLich"}, {"week": "W-1", "email": "NHULQ9", "leader": "HATTT39", "chbh": 617, "dhdl": 182, "dhtc": 55, "doanhso": 87602550, "aov": 1592774, "name": "Lê Quỳnh Như", "type": "NhacLich"}, {"week": "W-1", "email": "THULHA3", "leader": "TRONGND15", "chbh": 545, "dhdl": 187, "dhtc": 60, "doanhso": 87304400, "aov": 1455073, "name": "Lê Hồng Anh Thư", "type": "NhacLich"}, {"week": "W-1", "email": "HIEUTQ18", "leader": "HATTT39", "chbh": 549, "dhdl": 138, "dhtc": 62, "doanhso": 81114310, "aov": 1308295, "name": "Trương Quang Hiếu", "type": "NhacLich"}, {"week": "W-1", "email": "KIMNHM", "leader": "TRONGND15", "chbh": 465, "dhdl": 136, "dhtc": 63, "doanhso": 79495630, "aov": 1261835, "name": "Nguyễn Huỳnh Mỹ Kim", "type": "NhacLich"}, {"week": "W-1", "email": "TRANGPTK13", "leader": "HANP8", "chbh": 605, "dhdl": 163, "dhtc": 51, "doanhso": 73228410, "aov": 1435851, "name": "Phù Thị Kim Trang", "type": "NhacLich"}, {"week": "W-1", "email": "PHUONGDH24", "leader": "HATTT39", "chbh": 312, "dhdl": 77, "dhtc": 47, "doanhso": 66193820, "aov": 1408379, "name": "Dương Hồng Phượng", "type": "NhacLich"}, {"week": "W-1", "email": "TAMTNX2", "leader": "HANLNG2", "chbh": 558, "dhdl": 129, "dhtc": 50, "doanhso": 56442410, "aov": 1128848, "name": "Tôn Nữ Xuân Tâm", "type": "NhacLich"}, {"week": "W-1", "email": "MYLTT17", "leader": "HANP8", "chbh": 417, "dhdl": 132, "dhtc": 14, "doanhso": 18508810, "aov": 1322058, "name": "Lê Thị Thảo My", "type": "NhacLich"}, {"week": "W-1", "email": "VYNT46", "leader": "HANP8", "chbh": 377, "dhdl": 141, "dhtc": 12, "doanhso": 8663150, "aov": 721929, "name": "Ngô Triệu Vy", "type": "NhacLich"}, {"week": "W", "email": "THUATVH2", "leader": "HATTT39", "chbh": 403, "dhdl": 169, "dhtc": 105, "doanhso": 175777270, "aov": 1674069, "name": "Võ Huỳnh Thuật", "type": "NhacLich"}, {"week": "W", "email": "NGUYENHT37", "leader": "HANLNG2", "chbh": 315, "dhdl": 150, "dhtc": 98, "doanhso": 171498140, "aov": 1749981, "name": "Hoàng Thảo Nguyên", "type": "NhacLich"}, {"week": "W", "email": "LINHPTT43", "leader": "TRONGND15", "chbh": 648, "dhdl": 232, "dhtc": 106, "doanhso": 147999510, "aov": 1396222, "name": "Phạm Thị Trúc Linh", "type": "NhacLich"}, {"week": "W", "email": "TRANDTN2", "leader": "HATTT39", "chbh": 514, "dhdl": 141, "dhtc": 82, "doanhso": 133485490, "aov": 1627872, "name": "Đoàn Thị Ngọc Trân", "type": "NhacLich"}, {"week": "W", "email": "MYCA", "leader": "HATTT39", "chbh": 499, "dhdl": 184, "dhtc": 85, "doanhso": 131548960, "aov": 1547635, "name": "Châu Ái My", "type": "NhacLich"}, {"week": "W", "email": "LOANVTN", "leader": "TRONGND15", "chbh": 483, "dhdl": 165, "dhtc": 78, "doanhso": 125739000, "aov": 1612038, "name": "Võ Thị Ngọc Loan", "type": "NhacLich"}, {"week": "W", "email": "GIANGLT39", "leader": "TRONGND15", "chbh": 558, "dhdl": 242, "dhtc": 76, "doanhso": 122418600, "aov": 1610771, "name": "Lê Trường Giang", "type": "NhacLich"}, {"week": "W", "email": "KHOINT20", "leader": "HANLNG2", "chbh": 501, "dhdl": 217, "dhtc": 82, "doanhso": 121678710, "aov": 1483887, "name": "Nguyễn Thành Khôi", "type": "NhacLich"}, {"week": "W", "email": "TAMTNX2", "leader": "HANLNG2", "chbh": 547, "dhdl": 163, "dhtc": 74, "doanhso": 117088260, "aov": 1582274, "name": "Tôn Nữ Xuân Tâm", "type": "NhacLich"}, {"week": "W", "email": "NHULQ9", "leader": "HATTT39", "chbh": 496, "dhdl": 187, "dhtc": 75, "doanhso": 109113350, "aov": 1454845, "name": "Lê Quỳnh Như", "type": "NhacLich"}, {"week": "W", "email": "KIMNHM", "leader": "TRONGND15", "chbh": 543, "dhdl": 177, "dhtc": 70, "doanhso": 100568760, "aov": 1436697, "name": "Nguyễn Huỳnh Mỹ Kim", "type": "NhacLich"}, {"week": "W", "email": "OWENNVMC", "leader": "HANP8", "chbh": 564, "dhdl": 174, "dhtc": 65, "doanhso": 100157960, "aov": 1540892, "name": "Nguyễn Văn Mai Cơ Owen", "type": "NhacLich"}, {"week": "W", "email": "THAIVH13", "leader": "HATTT39", "chbh": 359, "dhdl": 187, "dhtc": 63, "doanhso": 97718320, "aov": 1551084, "name": "Võ Hoàng Thái", "type": "NhacLich"}, {"week": "W", "email": "LINHCTM2", "leader": "TRONGND15", "chbh": 624, "dhdl": 199, "dhtc": 75, "doanhso": 96960900, "aov": 1292812, "name": "Châu Thị Mỹ Linh", "type": "NhacLich"}, {"week": "W", "email": "PHUONGDH24", "leader": "HATTT39", "chbh": 354, "dhdl": 97, "dhtc": 59, "doanhso": 95773070, "aov": 1623272, "name": "Dương Hồng Phượng", "type": "NhacLich"}, {"week": "W", "email": "NHUTK4", "leader": "HANLNG2", "chbh": 440, "dhdl": 124, "dhtc": 61, "doanhso": 95489700, "aov": 1565405, "name": "Trần Kim Như", "type": "NhacLich"}, {"week": "W", "email": "THAOBT8", "leader": "HANP8", "chbh": 547, "dhdl": 156, "dhtc": 58, "doanhso": 94034350, "aov": 1621282, "name": "Bùi Thái Thảo", "type": "NhacLich"}, {"week": "W", "email": "NHIKH", "leader": "HANLNG2", "chbh": 446, "dhdl": 146, "dhtc": 57, "doanhso": 93087750, "aov": 1633118, "name": "Kha Huệ Nhi", "type": "NhacLich"}, {"week": "W", "email": "THULHA3", "leader": "TRONGND15", "chbh": 546, "dhdl": 169, "dhtc": 53, "doanhso": 90810900, "aov": 1713413, "name": "Lê Hồng Anh Thư", "type": "NhacLich"}, {"week": "W", "email": "THANHPTT5", "leader": "HANLNG2", "chbh": 502, "dhdl": 155, "dhtc": 78, "doanhso": 86565670, "aov": 1109816, "name": "Phan Thị Thanh Thanh", "type": "NhacLich"}, {"week": "W", "email": "HIEUTQ18", "leader": "HATTT39", "chbh": 452, "dhdl": 160, "dhtc": 57, "doanhso": 86482600, "aov": 1517239, "name": "Trương Quang Hiếu", "type": "NhacLich"}, {"week": "W", "email": "DUYENDTM24", "leader": "TRONGND15", "chbh": 501, "dhdl": 183, "dhtc": 59, "doanhso": 85308510, "aov": 1445907, "name": "Đào Thị Mỹ Duyên", "type": "NhacLich"}, {"week": "W", "email": "DUYENNMN2", "leader": "HANP8", "chbh": 671, "dhdl": 199, "dhtc": 61, "doanhso": 82393550, "aov": 1350714, "name": "Nguyễn Mỹ Ngọc Duyên", "type": "NhacLich"}, {"week": "W", "email": "TRANGPTK13", "leader": "HANP8", "chbh": 513, "dhdl": 152, "dhtc": 57, "doanhso": 80889290, "aov": 1419110, "name": "Phù Thị Kim Trang", "type": "NhacLich"}, {"week": "W", "email": "NGUYENNA16", "leader": "HATTT39", "chbh": 236, "dhdl": 72, "dhtc": 45, "doanhso": 72059960, "aov": 1601332, "name": "Nguyễn Anh Nguyên", "type": "NhacLich"}, {"week": "W", "email": "DUNGNTN9", "leader": "HANP8", "chbh": 457, "dhdl": 156, "dhtc": 52, "doanhso": 60154110, "aov": 1156810, "name": "Nguyễn Thị Ngọc Dung", "type": "NhacLich"}, {"week": "W", "email": "VYNT46", "leader": "HANP8", "chbh": 548, "dhdl": 224, "dhtc": 47, "doanhso": 53086500, "aov": 1129500, "name": "Ngô Triệu Vy", "type": "NhacLich"}, {"week": "W", "email": "MYLTT17", "leader": "HANP8", "chbh": 463, "dhdl": 151, "dhtc": 39, "doanhso": 42733030, "aov": 1095719, "name": "Lê Thị Thảo My", "type": "NhacLich"}];
+const STATIC_NHANSU = [{"email": "NGUYENHT37", "leader": "HANLNG2", "thamnien": "7"}, {"email": "TAMTNX2", "leader": "HANLNG2", "thamnien": "27"}, {"email": "NHIKH", "leader": "HANLNG2", "thamnien": "13"}, {"email": "KHOINT20", "leader": "HANLNG2", "thamnien": "4"}, {"email": "NHUTK4", "leader": "HANLNG2", "thamnien": "4"}, {"email": "TRANDTN2", "leader": "HATTT39", "thamnien": "25"}, {"email": "THUATVH2", "leader": "HATTT39", "thamnien": "20"}, {"email": "MYCA", "leader": "HATTT39", "thamnien": "25"}, {"email": "NHULQ9", "leader": "HATTT39", "thamnien": "14"}, {"email": "THAIVH13", "leader": "HATTT39", "thamnien": "4"}, {"email": "PHUONGDH24", "leader": "HATTT39", "thamnien": "3"}, {"email": "NGUYENNA16", "leader": "HATTT39", "thamnien": "3"}, {"email": "KIMNHM", "leader": "TRONGND15", "thamnien": "16"}, {"email": "LINHCTM2", "leader": "TRONGND15", "thamnien": "13"}, {"email": "THULHA3", "leader": "TRONGND15", "thamnien": "20"}, {"email": "LINHPTT43", "leader": "TRONGND15", "thamnien": "5"}, {"email": "LOANVTN", "leader": "TRONGND15", "thamnien": "5"}, {"email": "DUYENDTM24", "leader": "TRONGND15", "thamnien": "3"}, {"email": "THAOBT8", "leader": "HANP8", "thamnien": "27"}, {"email": "OWENNVMC", "leader": "HANP8", "thamnien": "24"}, {"email": "DUYENNMN2", "leader": "HANP8", "thamnien": "7"}, {"email": "TRANGPTK13", "leader": "HANP8", "thamnien": "4"}, {"email": "DUNGNTN9", "leader": "HANP8", "thamnien": "3"}, {"email": "THANHPTT5", "leader": "HANLNG2", "thamnien": "1"}, {"email": "HIEUTQ18", "leader": "HATTT39", "thamnien": "1"}, {"email": "GIANGLT39", "leader": "TRONGND15", "thamnien": "1"}, {"email": "VYNT46", "leader": "HANP8", "thamnien": "0"}, {"email": "MYLTT17", "leader": "HANP8", "thamnien": "0"}]; /* [{email,leader,thamnien}] */
+const LEADER_NAME = {"HANLNG2": "Lê Ngọc Gia Hân", "HATTT39": "Trịnh Thị Thu Hà", "TRONGND15": "Nguyễn Đức Trọng", "HANP8": "Nguyễn Phương Hà"};
+const TYPE_LABEL = {TongQuan:'Tổng Quan', YeuCau:'Yêu Cầu', VeTinh:'Vệ Tinh', NhacLich:'Nhắc Lịch'};
+const TENURE_LABEL = {new1:'Mới (<3 tháng)', new2:'Mới (3-6 tháng)', old:'Cũ (≥6 tháng)'};
+
+let ALL = STATIC_ALL;
+let NHANSU = STATIC_NHANSU;
+let DATA_SOURCE = {YeuCau:'sample', VeTinh:'sample', NhacLich:'sample'};
+
+const WEEKS = ['W-2','W-1','W'];
+const WEEK_LABEL = {'W-2':'2 tuần trước (W-2)','W-1':'Tuần trước (W-1)','W':'Tuần này (W)'};
+
+let state = { type:'TongQuan', week:'W', view:'sale', leader:'all', tenure:'all', search:'', sortK:'doanhso', sortDir:-1, trendSort:'off', oaFilter:'all' };
+
+function tenureGroupOf(months){
+  if(months===undefined || months===null) return null;
+  if(months < 3) return 'new1';
+  if(months < 6) return 'new2';
+  return 'old';
+}
+let TENURE_MAP = {}; /* email -> {thamnien, group} */
+function rebuildTenureMap(){
+  TENURE_MAP = {};
+  NHANSU.forEach(r=>{
+    const email = String(r.email).trim().toUpperCase();
+    const m = parseInt(r.thamnien,10);
+    TENURE_MAP[email] = { thamnien: isNaN(m)?null:m, group: tenureGroupOf(m) };
+  });
+}
+
+function fmtInt(n){ return Math.round(n||0).toLocaleString('vi-VN'); }
+function fmtMoney(n){ return Math.round(n||0).toLocaleString('vi-VN'); }
+function pct1(n){ return (isFinite(n)?n:0).toFixed(1).replace('.',',') + '%'; }
+function fmtTy(n){ return (n/1e9).toFixed(2).replace('.',',') + ' tỷ'; }
+function prevWeekOf(w){ const i = WEEKS.indexOf(w); return i>0 ? WEEKS[i-1] : null; }
+
+function wowBadge(curr, prev){
+  if(prev===null || prev===undefined) return '<span class="wow flat">—</span>';
+  if(prev===0){ return curr>0 ? '<span class="wow up">Mới</span>' : '<span class="wow flat">—</span>'; }
+  const d = (curr-prev)/Math.abs(prev)*100;
+  const cls = d>0.5 ? 'up' : (d<-0.5 ? 'down' : 'flat');
+  const arrow = d>0.5 ? '▲' : (d<-0.5 ? '▼' : '▪');
+  return `<span class="wow ${cls}">${arrow} ${Math.abs(d).toFixed(1).replace('.',',')}%</span>`;
+}
+function wowValue(curr, prev){
+  if(prev===null || prev===undefined || prev===0) return null;
+  return (curr-prev)/Math.abs(prev)*100;
+}
+function perfClass(value, avg){
+  if(!avg) return 'perf-mid';
+  const diff = (value-avg)/avg*100;
+  if(diff >= 10) return 'perf-good';
+  if(diff <= -10) return 'perf-low';
+  return 'perf-mid';
+}
+function perfCell(value, avg, text){
+  return `<span class="perf-cell ${perfClass(value,avg)}">${text}</span>`;
+}
+
+let COMBINED_ROWS = [];
+function recomputeCombined(){
+  const byKey = {}; /* week|email -> merged rec */
+  ALL.forEach(r=>{
+    const key = r.week + '|' + r.email;
+    if(!byKey[key]) byKey[key] = { type:'TongQuan', week:r.week, email:r.email, leader:r.leader, name:r.name, chbh:0, dhdl:0, dhtc:0, doanhso:0 };
+    const m = byKey[key];
+    m.chbh += r.chbh; m.dhdl += r.dhdl; m.dhtc += r.dhtc; m.doanhso += r.doanhso;
+    if(!m.name && r.name) m.name = r.name;
+    if(!m.leader && r.leader) m.leader = r.leader;
+  });
+  COMBINED_ROWS = Object.values(byKey).map(m=>({...m,
+    aov: m.dhtc? m.doanhso/m.dhtc : 0,
+    dhdlchbh: m.chbh? m.dhdl/m.chbh*100 : 0,
+    cr: m.chbh? m.dhtc/m.chbh*100 : 0
+  }));
+}
+function allRowsForType(type){ return type==='TongQuan' ? COMBINED_ROWS : ALL.filter(r=>r.type===type); }
+function rowsOf(type, week){ return allRowsForType(type).filter(r=>r.week===week); }
+function tenureOfEmail(email){
+  const t = TENURE_MAP[String(email).trim().toUpperCase()];
+  return t ? t.group : null;
+}
+
+function aggGroup(rows){
+  const chbh=rows.reduce((a,r)=>a+r.chbh,0), dhdl=rows.reduce((a,r)=>a+r.dhdl,0), dhtc=rows.reduce((a,r)=>a+r.dhtc,0);
+  const ds=rows.reduce((a,r)=>a+r.doanhso,0);
+  return {n:rows.length, chbh, dhdl, dhtc, ds,
+    dhdlchbh: chbh? dhdl/chbh*100:0, cr: chbh? dhtc/chbh*100:0,
+    aov: dhtc? ds/dhtc:0};
+}
+
+function applyRowFilters(rows){
+  return rows.filter(s=>
+    (state.leader==='all' || s.leader===state.leader) &&
+    (state.tenure==='all' || tenureOfEmail(s.email)===state.tenure) &&
+    (state.search==='' || s.name.toLowerCase().includes(state.search))
+  );
+}
+
+/* ============ RENDER ============ */
+function renderAll(){
+  ALL.forEach(r=>{ r.dhdlchbh = r.chbh? r.dhdl/r.chbh*100:0; r.cr = r.chbh? r.dhtc/r.chbh*100:0; });
+  rebuildTenureMap();
+
+  if(state.type==='TongQuan'){
+    const anySheet = ['YeuCau','VeTinh','NhacLich'].some(t=>DATA_SOURCE[t]==='sheet');
+    const allSheet = ['YeuCau','VeTinh','NhacLich'].every(t=>DATA_SOURCE[t]==='sheet');
+    document.getElementById('sourceStatus').innerHTML = allSheet
+      ? `🟢 Tổng Quan: cả 3 nguồn đều trực tiếp`
+      : anySheet ? `🟡 Tổng Quan: một số nguồn đang dùng dữ liệu mẫu` : `🟡 Tổng Quan: dữ liệu mẫu`;
+  } else {
+    const srcOk = DATA_SOURCE[state.type]==='sheet';
+    const reason = FETCH_DIAGNOSTIC[state.type];
+    document.getElementById('sourceStatus').innerHTML = srcOk
+      ? `🟢 ${TYPE_LABEL[state.type]}: dữ liệu trực tiếp`
+      : `🟡 ${TYPE_LABEL[state.type]}: dữ liệu mẫu${reason ? `<div style="font-size:9.5px;color:#e8b4b4;margin-top:3px">(${reason})</div>` : ''}`;
+  }
+  document.getElementById('pageTitle').textContent = TYPE_LABEL[state.type] + ' — Phân tích theo Sale / Leader / Nhóm thâm niên';
+
+  renderKPI();
+  renderTrend();
+  renderTable();
+  renderOverallAction();
+}
+
+function renderKPI(){
+  const week = state.week, prev = prevWeekOf(week);
+  const curRows = applyRowFilters(rowsOf(state.type, week));
+  const prevRows = prev ? applyRowFilters(rowsOf(state.type, prev)) : [];
+  const overall = aggGroup(curRows);
+  const prevOverall = prev ? aggGroup(prevRows) : null;
+
+  document.getElementById('kpiTitle').textContent = 'Tổng Quan — ' + TYPE_LABEL[state.type];
+  document.getElementById('kpiSub').textContent = `${overall.n} Sale — ${WEEK_LABEL[week]}`;
+
+  document.getElementById('kpiGrid').innerHTML = `
+    <div class="kpi-card"><div class="lbl">CHBH</div><div class="val">${fmtInt(overall.chbh)}</div><div class="sub">${prevOverall?wowBadge(overall.chbh,prevOverall.chbh):'—'}</div></div>
+    <div class="kpi-card"><div class="lbl">ĐHĐL/CHBH</div><div class="val">${pct1(overall.dhdlchbh)}</div><div class="sub">${prevOverall?wowBadge(overall.dhdlchbh,prevOverall.dhdlchbh):'—'}</div></div>
+    <div class="kpi-card"><div class="lbl">CR (ĐHTC/CHBH)</div><div class="val">${pct1(overall.cr)}</div><div class="sub">${prevOverall?wowBadge(overall.cr,prevOverall.cr):'—'}</div></div>
+    <div class="kpi-card"><div class="lbl">Doanh số</div><div class="val">${fmtTy(overall.ds)}</div><div class="sub">${prevOverall?wowBadge(overall.ds,prevOverall.ds):'—'}</div></div>
+    <div class="kpi-card"><div class="lbl">ĐHTC</div><div class="val">${fmtInt(overall.dhtc)}</div><div class="sub">${prevOverall?wowBadge(overall.dhtc,prevOverall.dhtc):'—'}</div></div>
+    <div class="kpi-card"><div class="lbl">AOV</div><div class="val">${fmtMoney(overall.aov)} đ</div><div class="sub">${prevOverall?wowBadge(overall.aov,prevOverall.aov):'—'}</div></div>
+  `;
+}
+
+function renderTrend(){
+  const week = state.week;
+  function trendBarRow(week, value, maxValue, color, valStr, isCurrent){
+    const w = Math.max(4, Math.min(100, value/maxValue*100));
+    return `<div class="trend-row"><div class="wlabel ${isCurrent?'cur':''}">${WEEK_LABEL[week].split(' (')[0]}</div><div class="bar-track"><div class="bar-fill" style="width:${w}%;background:${color}">${valStr}</div></div></div>`;
+  }
+  const weekAgg = {}; WEEKS.forEach(w=> weekAgg[w] = aggGroup(applyRowFilters(rowsOf(state.type, w))));
+  const maxChbh = Math.max(1, ...WEEKS.map(w=>weekAgg[w].chbh)) * 1.15;
+  const maxDs = Math.max(1, ...WEEKS.map(w=>weekAgg[w].ds)) * 1.15;
+  let t1 = '<div class="trend-block"><div class="trend-title">Tổng CHBH toàn team</div>';
+  WEEKS.forEach(w=> t1 += trendBarRow(w, weekAgg[w].chbh, maxChbh, w===week?'var(--teal)':'var(--purple)', fmtInt(weekAgg[w].chbh), w===week));
+  t1 += '</div><div class="trend-block"><div class="trend-title">Tổng Doanh số toàn team</div>';
+  WEEKS.forEach(w=> t1 += trendBarRow(w, weekAgg[w].ds, maxDs, w===week?'var(--teal)':'var(--purple)', fmtTy(weekAgg[w].ds), w===week));
+  t1 += '</div>';
+  document.getElementById('trendPanel1').innerHTML = t1;
+
+  let t2 = '<div class="trend-block"><div class="trend-title">ĐHĐL/CHBH toàn team</div>';
+  WEEKS.forEach(w=> t2 += trendBarRow(w, weekAgg[w].dhdlchbh, 60, w===week?'var(--teal)':'var(--purple)', pct1(weekAgg[w].dhdlchbh), w===week));
+  t2 += '</div><div class="trend-block"><div class="trend-title">CR (ĐHTC/CHBH) toàn team</div>';
+  WEEKS.forEach(w=> t2 += trendBarRow(w, weekAgg[w].cr, 25, w===week?'var(--teal)':'var(--purple)', pct1(weekAgg[w].cr), w===week));
+  t2 += '</div>';
+  document.getElementById('trendPanel2').innerHTML = t2;
+}
+
+/* ============================================================
+   OVERALL & ACTION — chấm điểm rủi ro từng Sale, tổng hợp theo Leader
+   "CR" trong mục này = ĐHĐL/CHBH (tỷ lệ chốt hẹn), khác với CR (ĐHTC/CHBH)
+   dùng ở các bảng khác của dashboard.
+   Thang điểm rủi ro (tối đa 80đ nền + 25đ cờ CR ảo):
+     CR thấp hơn TB team: 30đ · Doanh số/nhân sự thấp hơn TB: 30đ
+     AOV thấp hơn TB: 20đ · Cờ "CR ảo": +25đ
+   Vào danh sách recheck khi: điểm rủi ro ≥ 45/100 HOẶC CR < 25% (sàn tuyệt đối).
+   ============================================================ */
+const RECHECK_SCORE_THRESHOLD = 45; /* điểm rủi ro chỉ dùng để xếp hạng/hiển thị badge, không còn quyết định vào danh sách */
+const RECHECK_CR_FLOOR = 25;
+const CR_GAP_THRESHOLD = 5; /* CR phải thấp hơn TB team ít nhất 5 điểm % để tính là "CR thấp" trong rule recheck */
+
+function computeRiskForWeek(type, week){
+  const rows = rowsOf(type, week);
+  const teamAgg = aggGroup(rows);
+  const avgCR = teamAgg.dhdlchbh;          /* CR = ĐHĐL/CHBH, trung bình toàn team (pooled) */
+  const avgDSPerSale = teamAgg.n ? teamAgg.ds / teamAgg.n : 0;
+  const avgAOV = teamAgg.aov;
+
+  const out = rows.map(s=>{
+    let score = 0; const flags = [];
+    if(s.dhdlchbh < avgCR){ score += 30; flags.push('cr_low'); }
+    if(s.doanhso < avgDSPerSale){ score += 30; flags.push('ds_low'); }
+    if(s.aov < avgAOV){ score += 20; flags.push('aov_low'); }
+    let crAo = false;
+    if(s.dhdlchbh >= avgCR && s.doanhso < avgDSPerSale*0.7){ score += 25; crAo = true; flags.push('cr_ao'); }
+    const floorBreach = s.dhdlchbh < RECHECK_CR_FLOOR;
+    /* Rule Sale cần recheck: CẢ 3 điều kiện phải đúng đồng thời —
+       CR thấp hơn TB team ít nhất 5 điểm % · Doanh số dưới TB team · AOV dưới TB team. */
+    const crGapOk = (avgCR - s.dhdlchbh) >= CR_GAP_THRESHOLD;
+    const recheck = crGapOk && (s.doanhso < avgDSPerSale) && (s.aov < avgAOV);
+    return { ...s, riskScore:score, flags, crAo, floorBreach, recheck };
+  });
+  return { rows: out, avgCR, avgDSPerSale, avgAOV, teamAgg };
+}
+
+function recheckSetForWeek(type, week){
+  const r = computeRiskForWeek(type, week);
+  return new Set(r.rows.filter(x=>x.recheck).map(x=>x.email));
+}
+
+function statusTagFor(type, week, email){
+  const w1 = prevWeekOf(week);
+  if(!w1) return null; /* tuần đầu tiên, chưa có lịch sử để so sánh */
+  const set1 = recheckSetForWeek(type, w1);
+  if(!set1.has(email)) return 'Mới tuần này';
+  const w2 = prevWeekOf(w1);
+  if(w2){
+    const set2 = recheckSetForWeek(type, w2);
+    if(set2.has(email)) return 'Liên tục 3 tuần';
+  }
+  return 'Liên tục 2 tuần';
+}
+
+function scoreClass(score){ return score>=60?'s-hi':(score>=40?'s-mid':'s-lo'); }
+
+function reasonText(s, ctx){
+  const parts = [];
+  if(s.flags.includes('cr_ao')) parts.push(`⚠️ CR đạt mặt bằng nhóm (${pct1(s.dhdlchbh)}) nhưng Doanh số dưới 70% TB (${fmtMoney(s.doanhso)}đ vs TB ${fmtMoney(ctx.avgDSPerSale)}đ) — khả năng khách hẹn mà không ra`);
+  if(s.floorBreach) parts.push(`CR dưới sàn 25% (đang ${pct1(s.dhdlchbh)}) — bắt buộc rà soát`);
+  if(s.flags.includes('ds_low') && !s.flags.includes('cr_ao')) parts.push(`Doanh số/nhân sự thấp (${fmtMoney(s.doanhso)}đ vs TB ${fmtMoney(ctx.avgDSPerSale)}đ)`);
+  if(s.flags.includes('aov_low')) parts.push(`AOV thấp (${fmtMoney(s.aov)}đ vs TB ${fmtMoney(ctx.avgAOV)}đ) — thiếu upsell`);
+  if(s.flags.includes('cr_low') && !s.floorBreach) parts.push(`CR dưới TB team (${pct1(s.dhdlchbh)} vs TB ${pct1(ctx.avgCR)})`);
+  return parts.join(' · ');
+}
+
+function renderOverallAction(){
+  const type = state.type, week = state.week;
+  const risk = computeRiskForWeek(type, week);
+  const leaders = Array.from(new Set(risk.rows.map(r=>r.leader))).sort();
+
+  function severityOf(ld){
+    const ldRows = risk.rows.filter(r=>r.leader===ld);
+    const flaggedCount = ldRows.filter(r=>r.recheck).length;
+    const ratio = ldRows.length ? flaggedCount/ldRows.length : 0;
+    return ratio>=0.5 ? 'crit' : (ratio>=0.25 ? 'warn' : 'ok');
+  }
+  const visibleLeaders = state.oaFilter==='all' ? leaders : leaders.filter(ld=>severityOf(ld)===state.oaFilter);
+
+  document.getElementById('oaTitle').textContent = 'Overall & Action — ' + TYPE_LABEL[type];
+
+  const html = visibleLeaders.map(ld=>{
+    const ldRows = risk.rows.filter(r=>r.leader===ld);
+    const flagged = ldRows.filter(r=>r.recheck);
+    const ratio = ldRows.length ? flagged.length/ldRows.length : 0;
+    const sev = ratio>=0.5 ? 'crit' : (ratio>=0.25 ? 'warn' : 'ok');
+    const sevLabel = sev==='crit' ? 'Nghiêm trọng' : (sev==='warn' ? 'Cần chú ý' : 'Ổn định');
+    const g = aggGroup(ldRows);
+    const dsPerSale = g.n ? g.ds/g.n : 0;
+
+    const topRecheck = flagged.slice().sort((a,b)=>b.riskScore-a.riskScore);
+    const good = ldRows.filter(r=>!r.recheck && r.riskScore===0 && r.dhdlchbh>=risk.avgCR)
+      .sort((a,b)=>b.dhdlchbh-a.dhdlchbh).slice(0,1);
+
+    const crAoNames = ldRows.filter(r=>r.crAo).map(r=>r.name);
+    const dsLowNames = ldRows.filter(r=>r.flags.includes('ds_low'));
+    const aovLowNames = ldRows.filter(r=>r.flags.includes('aov_low'));
+
+    const actions = [];
+    if(topRecheck.length) actions.push(`Nghe ghi âm &amp; coaching chốt cho: ${topRecheck.map(r=>r.name).join(', ')}.`);
+    if(crAoNames.length) actions.push(`Ưu tiên xác minh các case "CR ảo" (chốt hẹn nhưng khách không ra tiêm): ${crAoNames.join(', ')}.`);
+    if(aovLowNames.length) actions.push(`Đẩy upsell mũi lẻ/gói cao cấp cho nhóm AOV thấp (${aovLowNames.length} Sale).`);
+    if(dsLowNames.length) actions.push(`Rà soát nguồn data &amp; nhịp gọi cho nhóm Doanh số/nhân sự dưới TB (${dsLowNames.length} Sale).`);
+    actions.push(`Theo dõi tiếp tuần sau để xác nhận xu hướng trước khi điều chỉnh nhân sự/data.`);
+
+    return `
+    <div class="oa-card">
+      <div class="oa-bar sev-${sev}">
+        <div class="oa-name">${LEADER_NAME[ld]||ld} <span class="oa-sev-badge">${sevLabel} · ${flagged.length} Sale</span></div>
+        <div class="oa-meta">CR ${pct1(g.dhdlchbh)} · DS ${fmtTy(g.ds)}</div>
+      </div>
+      <div class="oa-kpis">
+        <div class="oa-kpi"><div class="lbl">CR TB (ĐHĐL/CHBH)</div><div class="val">${pct1(g.dhdlchbh)}</div></div>
+        <div class="oa-kpi"><div class="lbl">CHBH</div><div class="val">${fmtInt(g.chbh)}</div></div>
+        <div class="oa-kpi"><div class="lbl">Doanh số</div><div class="val">${fmtTy(g.ds)}</div></div>
+        <div class="oa-kpi"><div class="lbl">AOV</div><div class="val">${fmtMoney(g.aov)}đ</div></div>
+        <div class="oa-kpi"><div class="lbl">DS/Nhân sự</div><div class="val">${fmtMoney(dsPerSale)}đ</div></div>
+      </div>
+      <div class="oa-body">
+        <div class="oa-2col">
+          <div class="oa-block">
+            <h5>📋 CHẤT LƯỢNG XỬ LÝ</h5>
+            <ul>
+              <li>CR trung bình nhóm <b>${pct1(g.dhdlchbh)}</b>, ${g.dhdlchbh>=risk.avgCR?'cao hơn':'thấp hơn'} mặt bằng team (<b>${pct1(risk.avgCR)}</b>).</li>
+              ${crAoNames.length?`<li><b>${crAoNames.length} Sale "CR ảo"</b>: ${crAoNames.join(', ')} — CR đẹp nhưng doanh số chưa tương xứng.</li>`:''}
+              <li>${flagged.length} / ${ldRows.length} Sale đang thuộc diện cần recheck (điểm rủi ro ≥ ${RECHECK_SCORE_THRESHOLD} hoặc CR &lt; ${RECHECK_CR_FLOOR}%).</li>
+            </ul>
+          </div>
+          <div class="oa-block">
+            <h5>💰 KẾT QUẢ DOANH SỐ</h5>
+            <ul>
+              <li>Doanh số nhóm <b>${fmtTy(g.ds)}</b>, DS/nhân sự <b>${fmtMoney(dsPerSale)}đ</b> (TB team ${fmtMoney(risk.avgDSPerSale)}đ).</li>
+              <li>AOV nhóm <b>${fmtMoney(g.aov)}đ</b> (TB team ${fmtMoney(risk.avgAOV)}đ).</li>
+              ${aovLowNames.length?`<li>${aovLowNames.length} Sale AOV dưới TB — cơ hội upsell chưa khai thác hết.</li>`:''}
+            </ul>
+          </div>
+        </div>
+
+        <h5>🎯 SALE CẦN RECHECK NGAY</h5>
+        ${topRecheck.length ? topRecheck.map(r=>{
+          const tag = statusTagFor(type, week, r.email);
+          return `<div class="oa-recheck-item">
+            <div class="rname">${r.name}
+              <span class="oa-score ${scoreClass(r.riskScore)}">${r.riskScore}đ</span>
+              ${r.crAo?'<span class="oa-flag-ao">CR ảo</span>':''}
+              ${tag?`<span class="oa-status-tag">${tag}</span>`:''}
+            </div>
+            <div class="rreason">→ ${reasonText(r, risk)}</div>
+          </div>`;
+        }).join('') : '<div style="font-size:12.5px;color:var(--muted)">Không có Sale nào vượt ngưỡng recheck tuần này.</div>'}
+
+        ${good.length ? `<h5 style="margin-top:14px">✅ CƠ HỘI CẢI THIỆN / GHI NHẬN TỐT</h5>
+        ${good.map(r=>`<div class="oa-good-item"><b>${r.name}</b> (CR ${pct1(r.dhdlchbh)}, DS ${fmtMoney(r.doanhso)}đ) — đang làm tốt, duy trì và chia sẻ cách làm cho nhóm.</div>`).join('')}` : ''}
+
+        <h5 style="margin-top:14px">✅ NEXT ACTION</h5>
+        <div class="oa-actions">
+          ${actions.map(a=>`<div class="oa-action-item">${a}</div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('overallActionWrap').innerHTML = (visibleLeaders.length ? html :
+    '<div class="panel" style="text-align:center;color:var(--muted);padding:24px">Không có Leader nào ở mức độ này.</div>');
+}
+
+function renderTable(){
+
+
+  const week = state.week, prev = prevWeekOf(week);
+  const curRowsAll = rowsOf(state.type, week);
+  const curRows = applyRowFilters(curRowsAll);
+  const prevByEmail = {}; if(prev) rowsOf(state.type, prev).forEach(r=> prevByEmail[r.email]=r);
+  const teamAvg = aggGroup(curRows); /* trung bình CR/AOV của tập đang lọc, dùng làm mốc so màu */
+
+  const leaders = Array.from(new Set(allRowsForType(state.type).map(r=>r.leader))).sort();
+  const fLeaderSel = document.getElementById('fLeader');
+  const prevSelVal = fLeaderSel.value || 'all';
+  fLeaderSel.innerHTML = '<option value="all">Tất cả</option>' + leaders.map(ld=>`<option value="${ld}">${LEADER_NAME[ld]||ld}</option>`).join('');
+  fLeaderSel.value = leaders.includes(prevSelVal) ? prevSelVal : 'all';
+  state.leader = fLeaderSel.value;
+
+  document.getElementById('tableTitle').textContent = {
+    sale: 'Bảng Chi Tiết Theo Sale — ' + TYPE_LABEL[state.type],
+    leader: 'Bảng Tổng Hợp Theo Leader — ' + TYPE_LABEL[state.type],
+    tenure: 'Bảng Tổng Hợp Theo Nhóm Thâm Niên — ' + TYPE_LABEL[state.type]
+  }[state.view];
+
+  const head = document.getElementById('tableHeadRow');
+
+  if(state.view==='sale'){
+    head.innerHTML = `
+      <th class="sortable" data-k="name">Tên Sale</th>
+      <th>Leader</th>
+      <th>Thâm niên</th>
+      <th class="sortable" data-k="chbh">CHBH</th>
+      <th class="delta-col">Δ CHBH</th>
+      <th class="sortable" data-k="dhdlchbh">ĐHĐL/CHBH</th>
+      <th class="sortable" data-k="cr">CR (ĐHTC/CHBH)</th>
+      <th class="sortable" data-k="doanhso">Doanh số</th>
+      <th class="delta-col">Δ Doanh số</th>
+      <th class="sortable" data-k="aov">AOV</th>`;
+
+    let rows = curRows.slice();
+    if(state.trendSort!=='off'){
+      rows = rows.map(s=>{
+        const p = prevByEmail[s.email];
+        const wv = p ? wowValue(s.doanhso, p.doanhso) : null;
+        return {...s, _wv: wv===null? -Infinity : wv};
+      });
+      rows.sort((a,b)=> state.trendSort==='up' ? b._wv-a._wv : a._wv-b._wv);
+    } else {
+      const getter = {name:r=>r.name, chbh:r=>r.chbh, dhdlchbh:r=>r.dhdlchbh, cr:r=>r.cr, doanhso:r=>r.doanhso, aov:r=>r.aov}[state.sortK];
+      rows.sort((a,b)=> (getter(a)>getter(b)?1:-1)*state.sortDir);
+    }
+
+    document.getElementById('mainTableBody').innerHTML = rows.map(s=>{
+      const p = prevByEmail[s.email];
+      const chbhDelta = p ? wowBadge(s.chbh, p.chbh) : '<span class="wow flat">—</span>';
+      const dsDelta = p ? wowBadge(s.doanhso, p.doanhso) : '<span class="wow flat">—</span>';
+      const tInfo = TENURE_MAP[String(s.email).trim().toUpperCase()];
+      const tLabel = tInfo && tInfo.thamnien!==null ? (tInfo.thamnien + ' th (' + TENURE_LABEL[tInfo.group] + ')') : '—';
+      return `<tr>
+        <td class="name-cell">${s.name}</td>
+        <td>${LEADER_NAME[s.leader]||s.leader}</td>
+        <td style="font-size:11.5px;color:var(--muted)">${tLabel}</td>
+        <td>${fmtInt(s.chbh)}</td>
+        <td class="delta-col">${chbhDelta}</td>
+        <td>${pct1(s.dhdlchbh)}</td>
+        <td>${perfCell(s.cr, teamAvg.cr, pct1(s.cr))}</td>
+        <td>${fmtMoney(s.doanhso)} đ</td>
+        <td class="delta-col">${dsDelta}</td>
+        <td>${perfCell(s.aov, teamAvg.aov, fmtMoney(s.aov)+' đ')}</td>
+      </tr>`;
+    }).join('') || '<tr><td colspan="10" style="text-align:center;color:var(--muted);padding:20px">Không có dữ liệu phù hợp bộ lọc.</td></tr>';
+
+  } else if(state.view==='leader'){
+    head.innerHTML = `
+      <th class="sortable" data-k="name">Leader</th>
+      <th class="sortable" data-k="n">Số Sale</th>
+      <th class="sortable" data-k="chbh">CHBH</th>
+      <th class="delta-col">Δ CHBH</th>
+      <th class="sortable" data-k="dhdlchbh">ĐHĐL/CHBH</th>
+      <th class="sortable" data-k="cr">CR (ĐHTC/CHBH)</th>
+      <th class="sortable" data-k="ds">Doanh số</th>
+      <th class="delta-col">Δ Doanh số</th>
+      <th class="sortable" data-k="aov">AOV</th>`;
+
+    const leadersInView = Array.from(new Set(curRows.map(r=>r.leader)));
+    let ldRows = leadersInView.map(ld=>{
+      const g = aggGroup(curRows.filter(r=>r.leader===ld));
+      const gp = prev ? aggGroup(applyRowFilters(rowsOf(state.type, prev)).filter(r=>r.leader===ld)) : null;
+      return {ld, name: LEADER_NAME[ld]||ld, ...g, _gp:gp};
+    });
+
+    if(state.trendSort!=='off'){
+      ldRows = ldRows.map(r=>{
+        const wv = r._gp ? wowValue(r.ds, r._gp.ds) : null;
+        return {...r, _wv: wv===null? -Infinity : wv};
+      });
+      ldRows.sort((a,b)=> state.trendSort==='up' ? b._wv-a._wv : a._wv-b._wv);
+    } else {
+      const getter = {name:r=>r.name, n:r=>r.n, chbh:r=>r.chbh, dhdlchbh:r=>r.dhdlchbh, cr:r=>r.cr, ds:r=>r.ds, aov:r=>r.aov}[state.sortK] || (r=>r.ds);
+      ldRows.sort((a,b)=> (getter(a)>getter(b)?1:-1)*state.sortDir);
+    }
+
+    document.getElementById('mainTableBody').innerHTML = ldRows.map(r=>{
+      const chbhDelta = r._gp ? wowBadge(r.chbh, r._gp.chbh) : '<span class="wow flat">—</span>';
+      const dsDelta = r._gp ? wowBadge(r.ds, r._gp.ds) : '<span class="wow flat">—</span>';
+      return `<tr>
+        <td class="name-cell">${r.name}</td>
+        <td>${r.n}</td>
+        <td>${fmtInt(r.chbh)}</td>
+        <td class="delta-col">${chbhDelta}</td>
+        <td>${pct1(r.dhdlchbh)}</td>
+        <td>${perfCell(r.cr, teamAvg.cr, pct1(r.cr))}</td>
+        <td>${fmtMoney(r.ds)} đ</td>
+        <td class="delta-col">${dsDelta}</td>
+        <td>${perfCell(r.aov, teamAvg.aov, fmtMoney(r.aov)+' đ')}</td>
+      </tr>`;
+    }).join('');
+
+  } else { /* tenure view */
+    head.innerHTML = `
+      <th class="sortable" data-k="name">Nhóm thâm niên</th>
+      <th class="sortable" data-k="n">Số Sale</th>
+      <th class="sortable" data-k="chbh">CHBH</th>
+      <th class="delta-col">Δ CHBH</th>
+      <th class="sortable" data-k="dhdlchbh">ĐHĐL/CHBH</th>
+      <th class="sortable" data-k="cr">CR (ĐHTC/CHBH)</th>
+      <th class="sortable" data-k="ds">Doanh số</th>
+      <th class="delta-col">Δ Doanh số</th>
+      <th class="sortable" data-k="aov">AOV</th>`;
+
+    const groups = ['new1','new2','old'];
+    let gRows = groups.map(g=>{
+      const rows = curRows.filter(r=> tenureOfEmail(r.email)===g);
+      const agg = aggGroup(rows);
+      const prevRows = prev ? applyRowFilters(rowsOf(state.type, prev)).filter(r=> tenureOfEmail(r.email)===g) : [];
+      const gp = prev ? aggGroup(prevRows) : null;
+      return {name: TENURE_LABEL[g], ...agg, _gp:gp};
+    }).filter(r=>r.n>0);
+
+    if(state.trendSort!=='off'){
+      gRows = gRows.map(r=>{
+        const wv = r._gp ? wowValue(r.ds, r._gp.ds) : null;
+        return {...r, _wv: wv===null? -Infinity : wv};
+      });
+      gRows.sort((a,b)=> state.trendSort==='up' ? b._wv-a._wv : a._wv-b._wv);
+    } else {
+      const getter = {name:r=>r.name, n:r=>r.n, chbh:r=>r.chbh, dhdlchbh:r=>r.dhdlchbh, cr:r=>r.cr, ds:r=>r.ds, aov:r=>r.aov}[state.sortK] || (r=>r.ds);
+      gRows.sort((a,b)=> (getter(a)>getter(b)?1:-1)*state.sortDir);
+    }
+
+    document.getElementById('mainTableBody').innerHTML = gRows.map(r=>{
+      const chbhDelta = r._gp ? wowBadge(r.chbh, r._gp.chbh) : '<span class="wow flat">—</span>';
+      const dsDelta = r._gp ? wowBadge(r.ds, r._gp.ds) : '<span class="wow flat">—</span>';
+      return `<tr>
+        <td class="name-cell">${r.name}</td>
+        <td>${r.n}</td>
+        <td>${fmtInt(r.chbh)}</td>
+        <td class="delta-col">${chbhDelta}</td>
+        <td>${pct1(r.dhdlchbh)}</td>
+        <td>${perfCell(r.cr, teamAvg.cr, pct1(r.cr))}</td>
+        <td>${fmtMoney(r.ds)} đ</td>
+        <td class="delta-col">${dsDelta}</td>
+        <td>${perfCell(r.aov, teamAvg.aov, fmtMoney(r.aov)+' đ')}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  document.querySelectorAll('#tableHeadRow th.sortable').forEach(th=>{
+    if(th.dataset.k===state.sortK && state.trendSort==='off'){
+      th.innerHTML += `<span class="arrow">${state.sortDir===1?'▲':'▼'}</span>`;
+    }
+    th.addEventListener('click', ()=>{
+      state.trendSort='off';
+      document.querySelectorAll('#trendSortBtns button').forEach(b=>b.classList.toggle('active', b.dataset.trend==='off'));
+      const k = th.dataset.k;
+      if(state.sortK===k) state.sortDir *= -1; else { state.sortK=k; state.sortDir=-1; }
+      renderTable();
+    });
+  });
+}
+
+/* ============ CONTROLS ============ */
+document.querySelectorAll('#typeNav button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('#typeNav button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    state.type = btn.dataset.type;
+    renderAll();
+  });
+});
+document.querySelectorAll('#viewToggle button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('#viewToggle button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    state.view = btn.dataset.view;
+    renderTable();
+  });
+});
+document.querySelectorAll('#oaSevFilter button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('#oaSevFilter button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    state.oaFilter = btn.dataset.sev;
+    renderOverallAction();
+  });
+});
+document.querySelectorAll('#trendSortBtns button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('#trendSortBtns button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    state.trendSort = btn.dataset.trend;
+    renderTable();
+  });
+});
+const weekSel = document.getElementById('weekSelect');
+weekSel.innerHTML = WEEKS.map(w=>`<option value="${w}" ${w===state.week?'selected':''}>${WEEK_LABEL[w]}</option>`).join('');
+weekSel.addEventListener('change', e=>{ state.week = e.target.value; renderAll(); });
+document.getElementById('fLeader').addEventListener('change', e=>{ state.leader = e.target.value; renderTable(); });
+document.getElementById('fTenure').addEventListener('change', e=>{ state.tenure = e.target.value; renderTable(); });
+document.getElementById('fSearch').addEventListener('input', e=>{ state.search = e.target.value.trim().toLowerCase(); renderTable(); });
+
+/* ============================================================
+   LIVE FETCH — 4 nguồn CSV riêng theo GID (3 loại dữ liệu + Nhân sự)
+   Cột dữ liệu tuần: 0 Tuần,1 Email,2 Inside,3 Trưởng nhóm,4 Team,5 CHBH,
+        6 ĐHĐL,7 ĐHĐL/CHBH,8 ĐHTC,9 ĐHTC/CHBH,10 Doanh số,11 DS TB Ngày,
+        12 AOV,13 Sale VT
+   Cột Nhân sự: 0 Inside,1 Họ và tên,2 Email,3 Chức danh,4 Tên trưởng nhóm,
+        5 Team,6 Ngày vào làm,7 Leader,8 Tháng Thâm Niên
+   ============================================================ */
+function parseCSV(text){
+  const rows = []; let row = []; let field = ''; let inQuotes = false;
+  for(let i=0;i<text.length;i++){
+    const c = text[i];
+    if(inQuotes){
+      if(c === '"'){ if(text[i+1] === '"'){ field += '"'; i++; } else { inQuotes = false; } }
+      else field += c;
+    } else {
+      if(c === '"') inQuotes = true;
+      else if(c === ','){ row.push(field); field=''; }
+      else if(c === '\n'){ row.push(field); rows.push(row); row=[]; field=''; }
+      else if(c === '\r'){ }
+      else field += c;
+    }
+  }
+  if(field!=='' || row.length){ row.push(field); rows.push(row); }
+  return rows.filter(r=> r.length>1 || (r[0]||'').trim()!=='');
+}
+function numInt(v){
+  if(v===undefined||v===null||v==='') return 0;
+  const cleaned = String(v).replace(/[^\d-]/g,'');
+  const f = parseInt(cleaned, 10);
+  return isNaN(f) ? 0 : f;
+}
+function parseTypeRows(rows, type){
+  const out = [];
+  for(let i=1;i<rows.length;i++){
+    const r = rows[i];
+    if(!r || !r[1] || !r[0]) continue;
+    const week = String(r[0]).trim();
+    if(!WEEKS.includes(week)) continue;
+    /* Không loại theo CHBH<=0 nữa — 1 dòng có thể có ĐHĐL/ĐHTC/Doanh số hợp lệ
+       dù CHBH tuần đó chưa kịp nhập; loại dòng sẽ làm KPI hiện sai thành 0. */
+    const rec = {
+      type, week, email: String(r[1]).trim(), leader: String(r[3]).trim(),
+      chbh: numInt(r[5]), dhdl: numInt(r[6]), dhtc: numInt(r[8]),
+      doanhso: numInt(r[10]), aov: numInt(r[12]),
+      name: String(r[13]||r[1]).trim()
+    };
+    out.push(rec);
+  }
+  return out;
+}
+function parseNhanSuRows(rows){
+  const out = [];
+  for(let i=1;i<rows.length;i++){
+    const r = rows[i];
+    if(!r || !r[2]) continue;
+    out.push({ email: String(r[2]).trim(), leader: String(r[7]||'').trim(), thamnien: numInt(r[8]) });
+  }
+  return out;
+}
+function sleep(ms){ return new Promise(res=>setTimeout(res, ms)); }
+async function fetchCSV(url){
+  const res = await fetch(url + (url.includes('?')?'&':'?') + '_ts=' + Date.now(), {cache:'no-store'});
+  if(!res.ok) throw new Error('HTTP '+res.status);
+  const text = await res.text();
+  const head = text.slice(0,200).trim().toLowerCase();
+  if(head.startsWith('<!doctype') || head.startsWith('<html')){
+    throw new Error('Sheet trả về trang HTML thay vì CSV — có thể chưa "Xuất bản lên web"');
+  }
+  return text;
+}
+function proxied(url){ return "https://api.allorigins.win/raw?url=" + encodeURIComponent(url); }
+
+async function loadType(type){
+  let lastErr = null;
+  const urls = [CONFIG[type], CONFIG_PUB[type], CONFIG_FALLBACK[type], proxied(CONFIG[type])];
+  for(let attempt=1; attempt<=2; attempt++){
+    for(const url of urls){
+      try{
+        const text = await fetchCSV(url);
+        const parsed = parseTypeRows(parseCSV(text), type);
+        if(parsed.length >= 5){ DATA_SOURCE[type]='sheet'; FETCH_DIAGNOSTIC[type]=null; return parsed; }
+        lastErr = 'Sheet trả về quá ít dòng hợp lệ (' + parsed.length + ')';
+      } catch(e){ lastErr = e.message; }
+    }
+    await sleep(500*attempt);
+  }
+  DATA_SOURCE[type]='sample';
+  FETCH_DIAGNOSTIC[type] = lastErr || 'Không rõ nguyên nhân';
+  return null;
+}
+async function loadNhanSu(){
+  const urls = [CONFIG.NhanSu, CONFIG_PUB.NhanSu, CONFIG_FALLBACK.NhanSu, proxied(CONFIG.NhanSu)];
+  for(let attempt=1; attempt<=2; attempt++){
+    for(const url of urls){
+      try{
+        const text = await fetchCSV(url);
+        const parsed = parseNhanSuRows(parseCSV(text));
+        if(parsed.length >= 5) return parsed;
+      } catch(e){ }
+    }
+    await sleep(500*attempt);
+  }
+  return null;
+}
+async function loadLiveData(){
+  const btn = document.getElementById('btnRefresh');
+  btn.textContent = '⏳ Đang tải...';
+  const [ycRes, vtRes, nlRes, nsRes] = await Promise.all([
+    loadType('YeuCau'), loadType('VeTinh'), loadType('NhacLich'), loadNhanSu()
+  ]);
+  let merged = [];
+  ['YeuCau','VeTinh','NhacLich'].forEach((type)=>{
+    const fresh = {YeuCau:ycRes, VeTinh:vtRes, NhacLich:nlRes}[type];
+    if(fresh) merged = merged.concat(fresh);
+    else merged = merged.concat(STATIC_ALL.filter(r=>r.type===type));
+  });
+  ALL = merged;
+  if(nsRes) NHANSU = nsRes;
+  recomputeCombined();
+  btn.textContent = '🔄 Làm mới dữ liệu';
+  document.getElementById('lastUpdated').textContent = 'Cập nhật: ' + new Date().toLocaleString('vi-VN');
+  renderAll();
+}
+document.getElementById('btnRefresh').addEventListener('click', loadLiveData);
+
+recomputeCombined();
+renderAll();
+loadLiveData();
+</script>
+</body>
+</html>
